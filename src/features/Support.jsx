@@ -19,7 +19,7 @@ export function ScholarshipTracker() {
           <Card key={s.id} onClick={() => setOpen(s.id)} className="p-3.5">
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
-                <div className="text-[13.5px] font-semibold text-navy-800">{s.name}</div>
+                <div className="text-[13.5px] font-semibold text-foreground">{s.name}</div>
                 <div className="text-[11px] text-slate-500">{s.by} · <b className="text-teal-700">{s.amount}</b></div>
               </div>
               <Badge color={s.step >= 4 ? 'green' : s.step === 0 ? 'slate' : 'sun'}>{s.step >= 4 ? 'Approved' : s.step === 0 ? 'Eligible' : 'In progress'}</Badge>
@@ -36,7 +36,7 @@ export function ScholarshipTracker() {
             <div className="rounded-xl bg-teal-50 p-3 text-sm text-teal-900"><b>{sc.amount}</b> · by {sc.by}<br /><span className="text-xs">Eligibility: {sc.eligibility}</span></div>
             <div className="mt-2 text-xs text-slate-500">Deadline: {fmtDate(sc.deadline, { day: 'numeric', month: 'long', year: 'numeric' })}</div>
             <div className="mt-4"><Steps steps={SCH_STEPS} current={sc.step} /></div>
-            <div className="mt-4 rounded-xl bg-slate-50 p-3 text-xs text-slate-600">📋 Needed: Aadhaar, income certificate (Village Office), bank passbook, previous mark list. The school scholarship helpdesk helps every Saturday 10 AM – 1 PM.</div>
+            <div className="mt-4 rounded-xl bg-slate-50 p-3 text-xs text-slate-600">Needed: Aadhaar, income certificate (Village Office), bank passbook, previous mark list. The school scholarship helpdesk helps every Saturday 10 AM – 1 PM.</div>
           </>
         )}
       </Sheet>
@@ -53,7 +53,7 @@ export function KitTracker() {
           <div className="flex items-center gap-3">
             <div className="grid h-10 w-10 place-items-center rounded-xl bg-sun-50"><Package className="h-5 w-5 text-sun-600" /></div>
             <div className="min-w-0 flex-1">
-              <div className="text-[13.5px] font-semibold text-navy-800">{k.name}</div>
+              <div className="text-[13.5px] font-semibold text-foreground">{k.name}</div>
               <div className="text-[11px] text-slate-500">Sponsored by {k.by}</div>
             </div>
             <Badge color={k.step >= 4 ? 'green' : 'sun'}>{k.status}</Badge>

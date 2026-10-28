@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Bar, BarChart, CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-import { AlertCircle, CheckCheck, ClipboardCheck, Clock, Languages, LifeBuoy, Megaphone, Printer, Send, Sparkles, Users } from 'lucide-react'
-import { Panel } from '../../components/DashShell'
+import { AlertCircle, Check, CheckCheck, ClipboardCheck, Clock, Languages, LifeBuoy, Megaphone, Printer, Send, ShieldCheck, Sparkles, Users } from 'lucide-react'
+import { DataTable, Panel } from '../../components/DashShell'
 import { Avatar, Badge, Button, Card, Field, Sheet, Stat, Tabs, Toggle, inputCls, useToast } from '../../components/ui'
 import SecureChat from '../../features/SecureChat'
 import { useSession, useStore } from '../../store/Store'
@@ -27,10 +27,10 @@ export function Dashboard() {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div><h2 className="font-display text-2xl font-extrabold text-navy-800">Good day, Fathima teacher 👋</h2><p className="text-sm text-slate-500">Class teacher · 9-B · Mathematics for 9-A, 9-B, 10-C</p></div>
+        <div><h2 className="font-display text-2xl font-extrabold tracking-tight text-foreground">Good day, Fathima</h2><p className="text-sm text-slate-500">Class teacher · 9-B · Mathematics for 9-A, 9-B, 10-C</p></div>
         <div className="flex gap-2"><Button icon={ClipboardCheck} onClick={() => nav('/teacher/attendance')}>Take attendance</Button><Button variant="teal" icon={Megaphone} onClick={() => nav('/teacher/notices')}>Post class update</Button></div>
       </div>
-      <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
         <Stat label="Present today (9-B)" value={today ? `${present}/${CLASS_9B.length}` : '—'} sub={today ? `Submitted ${fmtTime(today.submittedAt)}` : 'Not yet taken'} icon={Users} />
         <Stat label="Open help requests" value={myReqs.filter((r) => r.status !== 'Resolved').length} sub="Avg. response 2.1 hrs" icon={LifeBuoy} tone="coral" />
         <Stat label="Parents on Vidya Sethu" value={`${adoption}/${CLASS_9B.length}`} sub="Others get SMS fallback" icon={Megaphone} tone="sky" />
@@ -41,8 +41,8 @@ export function Dashboard() {
           <div className="space-y-2">
             {TIMETABLE.map((t) => (
               <div key={t.time} className={cx('flex items-center gap-3 rounded-xl p-2.5', t.subject === 'Mathematics' ? 'bg-teal-50' : 'bg-slate-50')}>
-                <div className="w-12 text-xs font-bold text-navy-800">{t.time}</div>
-                <div className="min-w-0 flex-1"><div className="truncate text-sm font-semibold text-navy-800">{t.subject}</div><div className="truncate text-[11px] text-slate-500">{t.topic}</div></div>
+                <div className="w-12 text-xs font-bold text-foreground">{t.time}</div>
+                <div className="min-w-0 flex-1"><div className="truncate text-sm font-semibold text-foreground">{t.subject}</div><div className="truncate text-[11px] text-slate-500">{t.topic}</div></div>
                 {t.subject === 'Mathematics' && <Badge color="teal">You</Badge>}
               </div>
             ))}
@@ -51,17 +51,17 @@ export function Dashboard() {
         <Panel title="Maths: Class 9-B average vs top 5" sub="Visual performance graph shared with parents" className="xl:col-span-2">
           <div className="h-64">
             <ResponsiveContainer>
-              <LineChart data={avg}><CartesianGrid strokeDasharray="3 3" stroke="#eef2f7" /><XAxis dataKey="exam" tick={{ fontSize: 11 }} /><YAxis domain={[40, 100]} tick={{ fontSize: 11 }} /><Tooltip /><Line dataKey="Class" stroke="#26a69a" strokeWidth={3} /><Line dataKey="Top 5" stroke="#f6b93b" strokeWidth={3} strokeDasharray="5 4" /></LineChart>
+              <LineChart data={avg}><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="exam" tick={{ fontSize: 11 }} /><YAxis domain={[40, 100]} tick={{ fontSize: 11 }} /><Tooltip /><Line dataKey="Class" stroke="#26a69a" strokeWidth={3} /><Line dataKey="Top 5" stroke="#f6b93b" strokeWidth={3} strokeDasharray="5 4" /></LineChart>
             </ResponsiveContainer>
           </div>
         </Panel>
       </div>
       <div className="grid gap-4 xl:grid-cols-2">
         <Panel title="Students needing attention" sub="Flagged by attendance, marks and family requests">
-          <div className="space-y-2">{attention.map((a) => <div key={a.name} className="flex items-center gap-3 rounded-xl bg-slate-50 p-3"><Avatar name={a.name} size={34} color="#14253f" /><div className="flex-1"><div className="text-sm font-semibold text-navy-800">{a.name}</div><div className="text-xs text-slate-500">{a.why}</div></div><Badge color={a.tone}>Follow up</Badge></div>)}</div>
+          <div className="space-y-2">{attention.map((a) => <div key={a.name} className="flex items-center gap-3 rounded-xl bg-slate-50 p-3"><Avatar name={a.name} size={34} color="#14253f" /><div className="flex-1"><div className="text-sm font-semibold text-foreground">{a.name}</div><div className="text-xs text-slate-500">{a.why}</div></div><Badge color={a.tone}>Follow up</Badge></div>)}</div>
         </Panel>
         <Panel title="Recent help requests" action={<Button size="sm" variant="soft" onClick={() => nav('/teacher/requests')}>Open all</Button>}>
-          <div className="space-y-2">{state.requests.slice(0, 4).map((r) => <div key={r.id} className="flex items-center gap-3 rounded-xl bg-slate-50 p-3"><div className="min-w-0 flex-1"><div className="truncate text-sm font-semibold text-navy-800">{r.title}</div><div className="text-xs text-slate-500">{r.byName} · {timeAgo(r.createdAt)}</div></div><Badge color={STATUS[r.status]}>{r.status}</Badge></div>)}</div>
+          <div className="space-y-2">{state.requests.slice(0, 4).map((r) => <div key={r.id} className="flex items-center gap-3 rounded-xl bg-slate-50 p-3"><div className="min-w-0 flex-1"><div className="truncate text-sm font-semibold text-foreground">{r.title}</div><div className="text-xs text-slate-500">{r.byName} · {timeAgo(r.createdAt)}</div></div><Badge color={STATUS[r.status]}>{r.status}</Badge></div>)}</div>
         </Panel>
       </div>
     </div>
@@ -98,9 +98,9 @@ export function Attendance() {
           {CLASS_9B.map((s) => {
             const m = marks[s.id]
             return (
-              <button key={s.id} onClick={() => setMarks({ ...marks, [s.id]: m === 'P' ? 'A' : m === 'A' ? 'L' : 'P' })} className={cx('flex items-center gap-3 rounded-xl p-2.5 text-left ring-1 transition', m === 'P' ? 'bg-white ring-slate-200' : m === 'A' ? 'bg-coral-50 ring-coral-300' : 'bg-sun-50 ring-sun-300')}>
+              <button key={s.id} onClick={() => setMarks({ ...marks, [s.id]: m === 'P' ? 'A' : m === 'A' ? 'L' : 'P' })} className={cx('flex items-center gap-3 rounded-xl p-2.5 text-left ring-1 transition', m === 'P' ? 'bg-card ring-slate-200' : m === 'A' ? 'bg-coral-50 ring-coral-300' : 'bg-sun-50 ring-sun-300')}>
                 <span className="w-6 text-center text-xs font-bold text-slate-400">{s.roll}</span>
-                <span className="min-w-0 flex-1"><span className="block truncate text-sm font-semibold text-navy-800">{s.name}</span><span className="text-[11px] text-slate-500">{s.bus} · {s.guardianApp ? 'Parent on app' : 'SMS / voice call'}</span></span>
+                <span className="min-w-0 flex-1"><span className="block truncate text-sm font-semibold text-foreground">{s.name}</span><span className="text-[11px] text-slate-500">{s.bus} · {s.guardianApp ? 'Parent on app' : 'SMS / voice call'}</span></span>
                 <span className={cx('grid h-8 w-8 place-items-center rounded-lg text-sm font-extrabold text-white', m === 'P' ? 'bg-teal-500' : m === 'A' ? 'bg-coral-500' : 'bg-sun-400')}>{m}</span>
               </button>
             )
@@ -143,7 +143,7 @@ export function Notices() {
         <div className="space-y-2">
           {mine.map((n) => (
             <div key={n.id} className="rounded-xl bg-slate-50 p-3">
-              <div className="flex items-start justify-between gap-2"><div className="text-sm font-semibold text-navy-800">{n.title}</div><Badge color={STATUS[n.status]}>{n.status === 'verified' ? 'Live ✓' : n.status}</Badge></div>
+              <div className="flex items-start justify-between gap-2"><div className="text-sm font-semibold text-foreground">{n.title}</div><Badge color={STATUS[n.status]}>{n.status === 'verified' ? 'Live ✓' : n.status}</Badge></div>
               <div className="mt-1 text-xs text-slate-500">{n.audience} · {timeAgo(n.at)}</div>
               {n.status === 'verified' && <div className="mt-2 flex items-center gap-2"><div className="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-200"><div className="h-full bg-teal-500" style={{ width: `${(n.reads / Math.max(1, n.reach)) * 100}%` }} /></div><span className="text-[11px] font-semibold text-slate-600">{n.reads}/{n.reach} read</span></div>}
             </div>
@@ -172,8 +172,8 @@ export function Messages() {
             const last = msgs[msgs.length - 1]
             return (
               <button key={t.id} onClick={() => setThread(t.id)} className={cx('flex w-full items-center gap-3 p-4 text-left', thread === t.id ? 'bg-teal-50' : 'hover:bg-slate-50')}>
-                <Avatar emoji={t.who.avatar} color={t.who.color} size={40} />
-                <div className="min-w-0 flex-1"><div className="text-sm font-semibold text-navy-800">{t.who.name}</div><div className="truncate text-xs text-slate-500">{last?.text}</div></div>
+                <Avatar name={t.who.name} color={t.who.color} size={40} />
+                <div className="min-w-0 flex-1"><div className="text-sm font-semibold text-foreground">{t.who.name}</div><div className="truncate text-xs text-slate-500">{last?.text}</div></div>
               </button>
             )
           })}
@@ -188,7 +188,7 @@ export function Messages() {
           <Field label="From"><input type="time" className={inputCls} value={state.chatWindow.start} onChange={(e) => mutate((d) => { d.chatWindow.start = e.target.value })} /></Field>
           <Field label="To"><input type="time" className={inputCls} value={state.chatWindow.end} onChange={(e) => mutate((d) => { d.chatWindow.end = e.target.value })} /></Field>
         </div>
-        <div className="rounded-xl bg-slate-50 p-3 text-xs text-slate-600">🛡️ Automated safety filters block phone numbers, links, abusive words and grooming patterns. Flagged messages go to the safeguarding lead.</div>
+        <div className="flex gap-2 rounded-2xl bg-muted p-3 text-xs text-muted-foreground"><ShieldCheck className="h-4 w-4 shrink-0 text-teal-600" />Automated safety filters block phone numbers, links, abusive words and grooming patterns. Flagged messages go to the safeguarding lead.</div>
       </Panel>
     </div>
   )
@@ -207,7 +207,7 @@ export function Gradebook() {
         <Tabs value={exam} onChange={setExam} tabs={['Unit 1', '1st Term', 'Unit 2', 'Unit 3']} />
         <Button variant="teal" icon={Send} onClick={() => toast('Marks published · parents can see graphs in the app', '📈')}>Publish to parents</Button>
       </div>
-      <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
         <Stat label="Class average" value={`${avg}%`} sub="Mathematics · 9-B" />
         <Stat label="Highest" value={Math.max(...vals)} tone="sun" />
         <Stat label="Below 40%" value={vals.filter((v) => v < 40).length} sub="Remedial class suggested" tone="coral" />
@@ -225,7 +225,7 @@ export function Gradebook() {
                   return (
                     <tr key={s.id} className="border-t border-slate-100">
                       <td className="px-4 py-2 text-slate-400">{s.roll}</td>
-                      <td className="px-4 py-2 font-medium text-navy-800">{s.name}</td>
+                      <td className="px-4 py-2 font-medium text-foreground">{s.name}</td>
                       <td className="px-4 py-2"><input type="number" min="0" max="100" value={marks[s.id]} onChange={(e) => setMarks({ ...marks, [s.id]: e.target.value })} className="w-20 rounded-lg bg-slate-50 px-2 py-1 ring-1 ring-slate-200 focus:outline-none focus:ring-teal-500" /></td>
                       <td className="px-4 py-2"><Badge color={m >= 80 ? 'green' : m >= 50 ? 'sky' : 'coral'}>{g}</Badge></td>
                     </tr>
@@ -236,8 +236,8 @@ export function Gradebook() {
           </div>
         </Panel>
         <Panel title="Distribution">
-          <div className="h-64"><ResponsiveContainer><BarChart data={dist}><CartesianGrid strokeDasharray="3 3" stroke="#eef2f7" /><XAxis dataKey="r" tick={{ fontSize: 11 }} /><YAxis allowDecimals={false} tick={{ fontSize: 11 }} /><Tooltip /><Bar dataKey="n" fill="#26a69a" radius={[8, 8, 0, 0]} /></BarChart></ResponsiveContainer></div>
-          <div className="mt-3 flex items-start gap-2 rounded-xl bg-sun-50 p-3 text-xs text-sun-700"><Sparkles className="mt-0.5 h-4 w-4 shrink-0" /> AI insight: 6 students lose marks on word problems. Suggest assigning audio pod “Quadratic equations in 6 minutes” (Malayalam).</div>
+          <div className="h-64"><ResponsiveContainer><BarChart data={dist}><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="r" tick={{ fontSize: 11 }} /><YAxis allowDecimals={false} tick={{ fontSize: 11 }} /><Tooltip /><Bar dataKey="n" fill="#26a69a" radius={[8, 8, 0, 0]} /></BarChart></ResponsiveContainer></div>
+          <div className="mt-3 flex items-start gap-2 rounded-2xl bg-sun-50 p-3 text-xs text-sun-700"><Sparkles className="mt-0.5 h-4 w-4 shrink-0" /> Insight: 6 students lose marks on word problems. Suggest assigning audio pod “Quadratic equations in 6 minutes” (Malayalam).</div>
         </Panel>
       </div>
     </div>
@@ -264,25 +264,15 @@ export function Requests() {
   }
   const sel = open && state.requests.find((r) => r.id === open)
   return (
-    <Panel title="Help requests" sub="Connect → Respond → Enable → Measure. Every response time is tracked for the pilot." action={<Tabs size="sm" value={filter} onChange={setFilter} tabs={['Open', 'Resolved', 'All']} />} pad={false}>
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-[720px] text-sm">
-          <thead className="bg-slate-50 text-left text-xs text-slate-500"><tr><th className="px-5 py-2.5">ID</th><th className="px-5 py-2.5">Request</th><th className="px-5 py-2.5">From</th><th className="px-5 py-2.5">Category</th><th className="px-5 py-2.5">Age</th><th className="px-5 py-2.5">Status</th><th /></tr></thead>
-          <tbody>
-            {list.map((r) => (
-              <tr key={r.id} className="border-t border-slate-100 hover:bg-slate-50">
-                <td className="px-5 py-3 font-mono text-xs text-slate-500">{r.id}</td>
-                <td className="px-5 py-3 font-semibold text-navy-800">{r.title}</td>
-                <td className="px-5 py-3 text-slate-600">{r.byName}</td>
-                <td className="px-5 py-3"><Badge>{r.category}</Badge></td>
-                <td className="px-5 py-3 text-slate-500">{timeAgo(r.createdAt)}</td>
-                <td className="px-5 py-3"><Badge color={STATUS[r.status]}>{r.status}</Badge></td>
-                <td className="px-5 py-3 text-right"><Button size="sm" variant="soft" onClick={() => setOpen(r.id)}>Open</Button></td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+    <Panel title="Help requests" sub="Questions from students and families, routed to you" action={<Tabs size="sm" value={filter} onChange={setFilter} tabs={['Open', 'Resolved', 'All']} />} pad={false}>
+      <DataTable rows={list} rowKey={(r) => r.id} onRow={(r) => setOpen(r.id)} empty="No requests in this view" columns={[
+        { label: 'Request', primary: true, render: (r) => <span>{r.title}<span className="block text-xs font-normal text-muted-foreground md:hidden">{r.byName}</span></span> },
+        { label: 'ID', hideMobile: true, render: (r) => <span className="font-mono text-xs text-muted-foreground">{r.id}</span> },
+        { label: 'From', hideMobile: true, render: (r) => <span className="text-muted-foreground">{r.byName}</span> },
+        { label: 'Category', render: (r) => <Badge>{r.category}</Badge> },
+        { label: 'Age', render: (r) => timeAgo(r.createdAt) },
+        { label: 'Status', side: true, render: (r) => <Badge color={STATUS[r.status]}>{r.status}</Badge> },
+      ]} />
       <Sheet fixed wide open={!!sel} onClose={() => setOpen(null)} title={sel ? `${sel.id} · ${sel.title}` : ''}
         footer={sel && sel.status !== 'Resolved' && <div className="flex gap-2"><Button variant="soft" className="flex-1" onClick={() => respond(sel, false)}>Send reply</Button><Button variant="teal" className="flex-1" onClick={() => respond(sel, true)}>Reply & resolve</Button></div>}>
         {sel && (
@@ -314,27 +304,27 @@ export function Onboarding() {
   }
   return (
     <div className="grid gap-4 xl:grid-cols-[1fr_1.4fr]">
-      <Panel title="Create student account" sub="Teacher-managed onboarding means no fake profiles and accurate data">
+      <Panel title="Create student account" sub="The guardian receives the login by SMS">
         <Field label="Student full name"><input className={inputCls} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="e.g. Fathima Hanna" /></Field>
         <div className="grid grid-cols-2 gap-3">
           <Field label="Class"><select className={inputCls} value={form.cls} onChange={(e) => setForm({ ...form, cls: e.target.value })}>{['9-A', '9-B', '9-C', '10-A'].map((c) => <option key={c}>{c}</option>)}</select></Field>
           <Field label="Guardian mobile"><input className={inputCls} value={form.guardian} onChange={(e) => setForm({ ...form, guardian: e.target.value.replace(/\D/g, '').slice(0, 10) })} placeholder="10-digit number" /></Field>
         </div>
-        <div className="mb-3 rounded-xl bg-slate-50 p-3 text-xs text-slate-600">✅ Parent consent recorded (DPDP) · ✅ Temporary password must be changed at first login · ✅ Parent sees only their own child</div>
+        <ul className="mb-4 space-y-1.5 rounded-2xl bg-muted p-3.5 text-xs text-muted-foreground">{['Parent consent is recorded', 'Temporary password must be changed at first login', 'Parents see only their own child'].map((t) => <li key={t} className="flex items-center gap-2"><Check className="h-3.5 w-3.5 text-teal-600" strokeWidth={3} />{t}</li>)}</ul>
         <Button className="w-full" variant="teal" disabled={!form.name || form.guardian.length < 10} onClick={create}>Generate login & send to guardian</Button>
       </Panel>
       <Panel title="Accounts created" sub={`${state.onboarded.length} students`} pad={false}>
-        <table className="w-full text-sm">
-          <thead className="bg-slate-50 text-left text-xs text-slate-500"><tr><th className="px-5 py-2.5">Student</th><th className="px-5 py-2.5">Username</th><th className="px-5 py-2.5">Temp password</th><th className="px-5 py-2.5">Status</th></tr></thead>
-          <tbody>{state.onboarded.map((o) => (
-            <tr key={o.username + o.at} className="border-t border-slate-100"><td className="px-5 py-3 font-semibold text-navy-800">{o.name} <span className="text-xs text-slate-400">{o.cls}</span></td><td className="px-5 py-3 font-mono text-xs">{o.username}</td><td className="px-5 py-3 font-mono text-xs">{o.status === 'Password changed' ? '••••••' : o.temp}</td><td className="px-5 py-3"><Badge color={o.status === 'Password changed' ? 'green' : 'sun'}>{o.status}</Badge></td></tr>
-          ))}</tbody>
-        </table>
+        <DataTable rows={state.onboarded} rowKey={(o) => o.username + o.at} minWidth={520} columns={[
+          { label: 'Student', primary: true, render: (o) => <span>{o.name} <span className="text-xs font-normal text-muted-foreground">{o.cls}</span></span> },
+          { label: 'Username', render: (o) => <span className="font-mono text-xs">{o.username}</span> },
+          { label: 'Temporary password', render: (o) => <span className="font-mono text-xs">{o.status === 'Password changed' ? '••••••' : o.temp}</span> },
+          { label: 'Status', side: true, render: (o) => <Badge color={o.status === 'Password changed' ? 'green' : 'sun'}>{o.status}</Badge> },
+        ]} />
       </Panel>
       <Sheet fixed open={!!slip} onClose={() => setSlip(null)} title="Login slip" footer={<Button className="w-full" icon={Printer} onClick={() => window.print()}>Print slip</Button>}>
         {slip && (
           <div className="rounded-2xl border-2 border-dashed border-slate-300 p-5 text-center">
-            <div className="font-display text-lg font-extrabold text-navy-800">Vidya Sethu · Vidyanagar GHSS</div>
+            <div className="font-display text-lg font-extrabold text-foreground">Vidya Sethu · Vidyanagar GHSS</div>
             <div className="mt-1 text-sm text-slate-600">{slip.name} · Class {slip.cls}</div>
             <div className="mt-4 grid grid-cols-2 gap-3 text-left text-sm"><div className="rounded-xl bg-slate-50 p-3"><div className="text-xs text-slate-500">Username</div><b className="font-mono">{slip.username}</b></div><div className="rounded-xl bg-slate-50 p-3"><div className="text-xs text-slate-500">Temporary password</div><b className="font-mono">{slip.temp}</b></div></div>
             <p className="mt-3 text-xs text-slate-500">Change this password at first login. Never share it outside your family.</p>
@@ -370,7 +360,7 @@ export function Nominations() {
         <div className="divide-y divide-slate-100">
           {state.nominations.filter((n) => n.cls === '9-B').map((n) => (
             <div key={n.id} className="flex items-center gap-3 px-5 py-3">
-              <div className="min-w-0 flex-1"><div className="text-sm font-semibold text-navy-800">{n.need} <span className="font-mono text-xs text-slate-400">{n.code}</span></div><div className="text-xs text-slate-500">{n.reason}</div></div>
+              <div className="min-w-0 flex-1"><div className="text-sm font-semibold text-foreground">{n.need} <span className="font-mono text-xs text-slate-400">{n.code}</span></div><div className="text-xs text-slate-500">{n.reason}</div></div>
               <Badge color={n.status === 'Sponsored' ? 'green' : n.status === 'Verified' ? 'sky' : 'sun'}>{n.status}</Badge>
             </div>
           ))}

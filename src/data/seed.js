@@ -1,7 +1,7 @@
 // All data in this prototype is fictional demo data.
 import { daysFromNow, hoursAgo } from '../lib/utils'
 
-export const DEMO_PASSWORD = '123456'
+export const DEMO_PASSWORD = '1234'
 
 export const SCHOOL = {
   name: 'Vidyanagar Govt. Higher Secondary School',

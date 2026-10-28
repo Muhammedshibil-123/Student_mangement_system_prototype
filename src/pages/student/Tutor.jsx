@@ -47,20 +47,20 @@ export default function Tutor() {
   const chips = grade <= 5 ? ['Why does it rain?', 'How do plants eat?', 'Who was Gandhiji?'] : ['Explain photosynthesis', 'What is the discriminant?', 'Gandhi & freedom movement', 'When is my next exam?']
 
   return (
-    <div className="flex h-full min-h-[calc(100%-1px)] flex-col">
+    <div className="flex min-h-0 flex-1 flex-col">
       <MobileHeader back="/student" title="AI Tutor" sub="Age-adaptive · syllabus-aligned">
-        <div className="mt-3 flex items-center gap-2 rounded-2xl bg-white p-2 shadow-card ring-1 ring-slate-900/5">
+        <div className="mt-3 flex items-center gap-2 rounded-2xl bg-card p-2 shadow-card ring-1 ring-slate-900/5">
           <span className="shrink-0 pl-1 text-[11px] font-semibold text-slate-500">Explain for</span>
           {[4, 7, 9, 12].map((g) => (
-            <button key={g} onClick={() => setGrade(g)} className={cx('flex-1 whitespace-nowrap rounded-full px-2 py-1 text-[11px] font-bold', grade === g ? 'bg-navy-800 text-white' : 'bg-slate-100 text-slate-600')}>Class {g}</button>
+            <button key={g} onClick={() => setGrade(g)} className={cx('flex-1 whitespace-nowrap rounded-full px-2 py-1 text-[11px] font-bold', grade === g ? 'bg-primary text-white' : 'bg-slate-100 text-slate-600')}>Class {g}</button>
           ))}
         </div>
       </MobileHeader>
-      <div className="flex-1 space-y-3 px-4 pb-36">
+      <div className="no-scrollbar min-h-0 flex-1 space-y-3 overflow-y-auto px-4 pb-4 pt-1">
         {msgs.map((m, i) => (
           <div key={i} className={cx('flex gap-2', m.from === 'me' && 'justify-end')}>
             {m.from === 'bot' && <div className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-gradient-to-br from-teal-400 to-sky-500 text-white"><Bot className="h-4 w-4" /></div>}
-            <div className={cx('max-w-[82%] rounded-2xl px-3.5 py-2.5 text-[13.5px] leading-relaxed', m.from === 'me' ? 'rounded-br-md bg-navy-800 text-white' : 'rounded-bl-md bg-white text-navy-800 shadow-sm ring-1 ring-slate-900/5')}>
+            <div className={cx('max-w-[82%] rounded-2xl px-3.5 py-2.5 text-[13.5px] leading-relaxed', m.from === 'me' ? 'rounded-br-md bg-primary text-white' : 'rounded-bl-md bg-card text-foreground shadow-sm ring-1 ring-slate-900/5')}>
               {m.text}
               {m.from === 'bot' && i > 0 && (
                 <div className="mt-2 flex flex-wrap items-center gap-2 border-t border-slate-100 pt-2">
@@ -72,19 +72,19 @@ export default function Tutor() {
             </div>
           </div>
         ))}
-        {typing && <div className="ml-10 w-fit rounded-2xl bg-white px-4 py-3 shadow-sm"><span className="flex gap-1">{[0, 1, 2].map((i) => <span key={i} className="h-1.5 w-1.5 animate-bounce rounded-full bg-teal-400" style={{ animationDelay: `${i * 0.15}s` }} />)}</span></div>}
+        {typing && <div className="ml-10 w-fit rounded-2xl bg-card px-4 py-3 shadow-sm"><span className="flex gap-1">{[0, 1, 2].map((i) => <span key={i} className="h-1.5 w-1.5 animate-bounce rounded-full bg-teal-400" style={{ animationDelay: `${i * 0.15}s` }} />)}</span></div>}
         <div ref={endRef} />
       </div>
-      <div className="absolute inset-x-0 bottom-[68px] z-10 bg-gradient-to-t from-slate-50 via-slate-50 to-transparent px-3 pb-2 pt-4 md:bottom-[76px]">
-        <div className="no-scrollbar mb-2 flex gap-1.5 overflow-x-auto">
-          {chips.map((c) => <button key={c} onClick={() => ask(c)} className="shrink-0 rounded-full bg-white px-3 py-1.5 text-[11px] font-semibold text-navy-800 ring-1 ring-slate-200">{c}</button>)}
+      <div className="border-t border-border bg-card/90 px-3 pt-2.5 backdrop-blur-xl" style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 10px)' }}>
+        <div className="no-scrollbar mask-x -mx-3 mb-2 flex gap-1.5 overflow-x-auto px-3">
+          {chips.map((c) => <button key={c} onClick={() => ask(c)} className="shrink-0 rounded-full bg-card px-3 py-1.5 text-[11px] font-semibold text-foreground ring-1 ring-border transition-colors hover:bg-muted">{c}</button>)}
         </div>
-        <form onSubmit={(e) => { e.preventDefault(); ask() }} className="flex items-center gap-2 rounded-full bg-white p-1.5 pl-4 shadow-float ring-1 ring-slate-900/5">
+        <form onSubmit={(e) => { e.preventDefault(); ask() }} className="flex items-center gap-2 rounded-full bg-muted p-1.5 pl-4">
           <input value={text} onChange={(e) => setText(e.target.value)} placeholder="Ask a doubt…" className="min-w-0 flex-1 bg-transparent text-sm outline-none" />
           {text ? <button type="submit" className="grid h-9 w-9 place-items-center rounded-full bg-teal-500 text-white" aria-label="Send"><Send className="h-4 w-4" /></button>
             : <MicButton size={36} lang={lang} fallback={grade <= 5 ? 'Why does it rain?' : 'Explain photosynthesis'} onText={(t) => ask(t)} />}
         </form>
-        <div className="mt-1.5 flex items-center justify-center gap-1 text-[10px] text-slate-400"><ShieldCheck className="h-3 w-3" /> Child-safe AI · no personal data stored · teachers can review</div>
+        <div className="mt-1.5 flex items-center justify-center gap-1 text-[10px] text-slate-400"><ShieldCheck className="h-3 w-3" /> Child-safe answers from the SCERT syllabus</div>
       </div>
     </div>
   )

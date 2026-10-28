@@ -2,28 +2,87 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  color-scheme: light;
-  --bg: #f8fafc;
+@layer base {
+  :root { color-scheme: light; }
+  html, body, #root { height: 100%; }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: Inter, 'Noto Sans Malayalam', 'Noto Sans Devanagari', system-ui, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior-y: none;
+  }
+  h1, h2, h3 { text-wrap: balance; }
+  :focus-visible { outline: 2px solid rgb(var(--teal-500)); outline-offset: 2px; border-radius: 6px; }
+  input, textarea, select { font-size: 16px; } /* stops iOS zooming into fields */
+  @media (min-width: 640px) { input, textarea, select { font-size: inherit; } }
 }
 
-html, body, #root { min-height: 100%; }
-body {
-  background: var(--bg);
-  color: #14253f;
-  font-family: Inter, 'Noto Sans Malayalam', 'Noto Sans Devanagari', system-ui, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -webkit-tap-highlight-color: transparent;
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { scrollbar-width: none; }
+  .tabular { font-variant-numeric: tabular-nums; }
+  .pt-safe { padding-top: env(safe-area-inset-top, 0px); }
+  .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
+
+  /* css-alpha-masking skill: fade the edges of horizontal scrollers */
+  .mask-x {
+    mask-image: linear-gradient(to right, transparent, black 16px, black calc(100% - 24px), transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 16px, black calc(100% - 24px), transparent);
+  }
+
+  /* css-border-gradient skill: quiet premium edge for hero surfaces */
+  .edge-gradient { position: relative; }
+  .edge-gradient::before {
+    content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1px; pointer-events: none;
+    background: linear-gradient(145deg, rgb(255 255 255 / .38), rgb(var(--teal-400) / .35) 45%, rgb(255 255 255 / .06));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor; mask-composite: exclude;
+  }
+  .edge-gradient-soft::before {
+    background: linear-gradient(145deg, rgb(var(--teal-300) / .55), rgb(var(--sky-300) / .25) 45%, rgb(var(--slate-200) / .2));
+  }
 }
 
-.no-scrollbar::-webkit-scrollbar { display: none; }
-.no-scrollbar { scrollbar-width: none; }
+/* progressive-blur skill: stepped backdrop blur that fades from an edge */
+.edge-blur { position: absolute; inset-inline: 0; pointer-events: none; z-index: 15; }
+.edge-blur > div, .edge-blur::before, .edge-blur::after { position: absolute; inset: 0; content: ""; }
+.edge-blur.top { top: 0; }
+.edge-blur.bottom { bottom: 0; }
+.edge-blur.top::before { backdrop-filter: blur(1px); mask: linear-gradient(to top, transparent 0%, #000 25%, #000 50%, transparent 75%); -webkit-mask: linear-gradient(to top, transparent 0%, #000 25%, #000 50%, transparent 75%); }
+.edge-blur.top > div:nth-child(1) { backdrop-filter: blur(3px); mask: linear-gradient(to top, transparent 25%, #000 50%, #000 75%, transparent 100%); -webkit-mask: linear-gradient(to top, transparent 25%, #000 50%, #000 75%, transparent 100%); }
+.edge-blur.top::after { backdrop-filter: blur(8px); mask: linear-gradient(to top, transparent 50%, #000 100%); -webkit-mask: linear-gradient(to top, transparent 50%, #000 100%); }
+.edge-blur.bottom::before { backdrop-filter: blur(1px); mask: linear-gradient(to bottom, transparent 0%, #000 25%, #000 50%, transparent 75%); -webkit-mask: linear-gradient(to bottom, transparent 0%, #000 25%, #000 50%, transparent 75%); }
+.edge-blur.bottom > div:nth-child(1) { backdrop-filter: blur(3px); mask: linear-gradient(to bottom, transparent 25%, #000 50%, #000 75%, transparent 100%); -webkit-mask: linear-gradient(to bottom, transparent 25%, #000 50%, #000 75%, transparent 100%); }
+.edge-blur.bottom::after { backdrop-filter: blur(8px); mask: linear-gradient(to bottom, transparent 50%, #000 100%); -webkit-mask: linear-gradient(to bottom, transparent 50%, #000 100%); }
 
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  20%, 60% { transform: translateX(-8px); }
-  40%, 80% { transform: translateX(8px); }
-}
+/* animation-on-scroll skill: reveal paused until in view (falls back to visible) */
+.reveal { animation: animationIn .55s cubic-bezier(.2,.8,.2,1) both; animation-play-state: paused; }
+.reveal.in { animation-play-state: running; }
+@keyframes animationIn { from { opacity: 0; transform: translateY(14px); filter: blur(6px); } to { opacity: 1; transform: none; filter: none; } }
 
-/* Recharts focus outline */
+@keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-8px); } 40%, 80% { transform: translateX(8px); } }
+
+/* Charts follow the theme */
 .recharts-wrapper *:focus { outline: none; }
+.recharts-cartesian-grid line, .recharts-polar-grid path, .recharts-polar-grid line { stroke: rgb(var(--border)); }
+.recharts-text, .recharts-cartesian-axis-tick-value, .recharts-polar-angle-axis-tick-value { fill: rgb(var(--muted-foreground)); }
+.recharts-cartesian-axis-line, .recharts-cartesian-axis-tick-line { stroke: rgb(var(--border)); }
+.recharts-default-tooltip { background: rgb(var(--card)) !important; border: 1px solid rgb(var(--border)) !important; border-radius: 12px !important; color: rgb(var(--foreground)); font-size: 12px; }
+.recharts-tooltip-cursor { fill: rgb(var(--muted)); }
+
+/* Bus map land/road colours */
+.map-bg { fill: #eef3ea; } .map-field-a { fill: #dcefd3; } .map-field-b { stroke: #c8e4bb; } .map-grove { fill: #cfe5c3; }
+.map-road { stroke: #ffffff; } .map-label { fill: #14253f; stroke: #eef3ea; } .map-box { background: #eef3ea; }
+.dark .map-bg { fill: #121c1a; } .dark .map-field-a { fill: #18281f; } .dark .map-field-b { stroke: #1d3226; } .dark .map-grove { fill: #1b2d22; }
+.dark .map-road { stroke: #2a3648; } .dark .map-label { fill: #e8edf5; stroke: #121c1a; } .dark .map-box { background: #121c1a; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+  .reveal { animation-play-state: running; }
+}
+
+/* sign-in fields: staggered entrance (delay set inline) */
+[data-anim] { animation: animationIn .45s cubic-bezier(.2,.8,.2,1) both; }
+
+/* stat grids: an odd last tile spans the row on phones and tablets */
+@media (max-width: 1279px) { .grid-fill > :last-child:nth-child(odd) { grid-column: 1 / -1; } }

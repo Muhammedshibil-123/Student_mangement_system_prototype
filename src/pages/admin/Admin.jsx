@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Area, AreaChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { AlertTriangle, CheckCircle2, Circle, Clock, FileCheck2, Megaphone, MessageCircleQuestion, School, Send, Siren, Users } from 'lucide-react'
-import { Panel } from '../../components/DashShell'
+import { DataTable, Panel } from '../../components/DashShell'
 import { Badge, Button, Progress, Stat, Toggle, inputCls, useToast } from '../../components/ui'
 import { useStore } from '../../store/Store'
 import { PILOT_SCHOOLS, WEEKLY_METRICS } from '../../data/seed'
@@ -13,41 +13,40 @@ export function Command() {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
-        <div><h2 className="font-display text-2xl font-extrabold text-navy-800">Malappuram pilot · Month 4</h2><p className="text-sm text-slate-500">Phase 1 (Foundation) · Go-to-market stage: <b>Pilot → Prove</b></p></div>
+        <div><h2 className="font-display text-2xl font-extrabold text-foreground">Malappuram pilot · Month 4</h2><p className="text-sm text-slate-500">Phase 1 (Foundation) · Go-to-market stage: <b>Pilot → Prove</b></p></div>
         <div className="flex gap-2"><Badge color="green">{live.length} schools live</Badge><Badge color="sun">2 onboarding</Badge></div>
       </div>
-      <div className="grid grid-cols-2 gap-4 xl:grid-cols-5">
+      <div className="grid-fill grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-5">
         <Stat label="Students covered" value={totalStudents.toLocaleString('en-IN')} sub="7 schools" icon={School} />
         <Stat label="Active families" value="3,260" sub="▲ 11% w/w" icon={Users} tone="sky" />
         <Stat label="Verified notices" value="171" sub="77% average read rate" icon={FileCheck2} tone="sun" />
         <Stat label="Median response" value="3.6 h" sub="target < 6 h" icon={Clock} tone="teal" />
-        <Stat label="Cost per learner / yr" value="₹212" sub="infra + SMS + support (A)" icon={Megaphone} tone="coral" />
+        <Stat label="Cost per learner / yr" value="₹212" sub="Hosting, SMS and support" icon={Megaphone} tone="coral" />
       </div>
       <div className="grid gap-4 xl:grid-cols-3">
         <Panel title="Weekly active families" className="xl:col-span-2">
-          <div className="h-64"><ResponsiveContainer><AreaChart data={WEEKLY_METRICS}><defs><linearGradient id="ga" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stopColor="#2f6bbf" stopOpacity=".35" /><stop offset="1" stopColor="#2f6bbf" stopOpacity="0" /></linearGradient></defs><CartesianGrid strokeDasharray="3 3" stroke="#eef2f7" /><XAxis dataKey="w" tick={{ fontSize: 11 }} /><YAxis tick={{ fontSize: 11 }} /><Tooltip /><Area dataKey="families" stroke="#2f6bbf" strokeWidth={3} fill="url(#ga)" /></AreaChart></ResponsiveContainer></div>
+          <div className="h-64"><ResponsiveContainer><AreaChart data={WEEKLY_METRICS}><defs><linearGradient id="ga" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stopColor="#2f6bbf" stopOpacity=".35" /><stop offset="1" stopColor="#2f6bbf" stopOpacity="0" /></linearGradient></defs><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="w" tick={{ fontSize: 11 }} /><YAxis tick={{ fontSize: 11 }} /><Tooltip /><Area dataKey="families" stroke="#2f6bbf" strokeWidth={3} fill="url(#ga)" /></AreaChart></ResponsiveContainer></div>
         </Panel>
         <Panel title="Feature usage (last 30 days)">
-          <div className="space-y-3">{[['Verified notices', 92], ['Bus radar', 71], ['Attendance alerts', 68], ['Audio pods (offline)', 44], ['Help requests', 23], ['AI tutor', 19], ['Counselling (anon.)', 6]].map(([l, v]) => <div key={l}><div className="mb-1 flex justify-between text-xs"><span className="font-medium text-navy-800">{l}</span><span className="text-slate-500">{v}% of families</span></div><Progress value={v} h={6} color={v > 60 ? '#26a69a' : v > 30 ? '#2f6bbf' : '#f6b93b'} /></div>)}</div>
+          <div className="space-y-3">{[['Verified notices', 92], ['Bus radar', 71], ['Attendance alerts', 68], ['Audio pods (offline)', 44], ['Help requests', 23], ['AI tutor', 19], ['Counselling (anon.)', 6]].map(([l, v]) => <div key={l}><div className="mb-1 flex justify-between text-xs"><span className="font-medium text-foreground">{l}</span><span className="text-slate-500">{v}% of families</span></div><Progress value={v} h={6} color={v > 60 ? '#26a69a' : v > 30 ? '#2f6bbf' : '#f6b93b'} /></div>)}</div>
         </Panel>
       </div>
-      <Panel title="‘Test first’ validation tracker" sub="From the risk report: prove demand cheaply before building more features">
+      <Panel title="Pilot milestones" sub="Partner commitments for the next expansion">
         <div className="grid gap-3 md:grid-cols-3">
           {[
-            ['Will private-school principals sign a ₹15,000+ letter of intent?', 'Met 18 of 25 principals', 2, 3, 'LOIs signed (need 3)'],
-            ['Do parents really miss notices today?', 'Audited 20 notices · called 15 parents', 9, 15, 'parents missed ≥ 1 key notice'],
-            ['Will an NGO with CSR-1 fund a migrant-family pilot?', 'Spoke to 3 NGOs', 1, 1, 'scoping agreement signed ✓'],
+            ['Private-school letters of intent', 'Met 18 of 25 principals', 2, 3, 'signed of 3 needed'],
+            ['Parent notice survey', 'Audited 20 notices · called 15 parents', 9, 15, 'parents had missed a key notice'],
+            ['Migrant-family support pilot', 'Spoke to 3 CSR-registered NGOs', 1, 1, 'scoping agreement signed'],
           ].map(([q, s, v, t, l]) => (
             <div key={q} className="rounded-2xl bg-slate-50 p-4">
-              <div className="text-sm font-semibold text-navy-800">{q}</div>
+              <div className="text-sm font-semibold text-foreground">{q}</div>
               <div className="mt-1 text-xs text-slate-500">{s}</div>
-              <div className="mt-3 flex items-end justify-between"><span className="font-display text-2xl font-extrabold text-navy-800">{v}/{t}</span><Badge color={v >= t ? 'green' : 'sun'}>{v >= t ? 'Passed' : 'In progress'}</Badge></div>
+              <div className="mt-3 flex items-end justify-between"><span className="font-display text-2xl font-extrabold text-foreground">{v}/{t}</span><Badge color={v >= t ? 'green' : 'sun'}>{v >= t ? 'Done' : 'In progress'}</Badge></div>
               <div className="text-[11px] text-slate-500">{l}</div>
               <Progress className="mt-2" value={(v / t) * 100} h={6} color={v >= t ? '#10b981' : '#f6b93b'} />
             </div>
           ))}
         </div>
-        <p className="mt-3 text-xs text-slate-500">Stop / redesign rule: fewer than 3 signed LOIs from 25 school conversations, or no NGO commitment within 4 months.</p>
       </Panel>
     </div>
   )
@@ -55,20 +54,15 @@ export function Command() {
 
 export function Schools() {
   return (
-    <Panel title="Pilot schools · Malappuram" sub="5–10 schools in one district before expanding" pad={false}>
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-[860px] text-sm">
-          <thead className="bg-slate-50 text-left text-xs text-slate-500"><tr><th className="px-5 py-2.5">School</th><th className="px-5 py-2.5">Type</th><th className="px-5 py-2.5">Students</th><th className="px-5 py-2.5">Family adoption</th><th className="px-5 py-2.5">Notices / mo</th><th className="px-5 py-2.5">Avg. response</th><th className="px-5 py-2.5">Buses</th><th className="px-5 py-2.5">Status</th></tr></thead>
-          <tbody>{PILOT_SCHOOLS.map((s) => (
-            <tr key={s.name} className="border-t border-slate-100">
-              <td className="px-5 py-3 font-semibold text-navy-800">{s.name}</td><td className="px-5 py-3"><Badge>{s.type}</Badge></td><td className="px-5 py-3">{s.students.toLocaleString('en-IN')}</td>
-              <td className="px-5 py-3"><div className="flex items-center gap-2"><div className="w-24"><Progress value={s.adoption} h={6} color={s.adoption > 70 ? '#26a69a' : s.adoption > 50 ? '#f6b93b' : '#ec7563'} /></div><span className="text-xs font-semibold">{s.adoption}%</span></div></td>
-              <td className="px-5 py-3">{s.notices}</td><td className="px-5 py-3">{s.resp ? s.resp + ' h' : '—'}</td><td className="px-5 py-3">{s.buses}</td>
-              <td className="px-5 py-3"><Badge color={s.status === 'Live' ? 'green' : s.status === 'Onboarding' ? 'sun' : 'sky'}>{s.status}</Badge></td>
-            </tr>
-          ))}</tbody>
-        </table>
-      </div>
+    <Panel title="Pilot schools · Malappuram" sub="Live and onboarding schools" pad={false}>
+      <DataTable rows={PILOT_SCHOOLS} rowKey={(x) => x.name} minWidth={860} columns={[
+        { label: 'School', primary: true, render: (x) => <span>{x.name}<span className="block text-[11px] font-normal text-muted-foreground">{x.type} · {x.students.toLocaleString('en-IN')} students</span></span> },
+        { label: 'Family adoption', render: (x) => <span className="flex items-center gap-2"><span className="w-20"><Progress value={x.adoption} h={6} color={x.adoption > 70 ? '#26a69a' : x.adoption > 50 ? '#f6b93b' : '#ec7563'} /></span><span className="tabular text-xs font-semibold">{x.adoption}%</span></span> },
+        { label: 'Notices / mo', render: (x) => <span className="tabular">{x.notices}</span> },
+        { label: 'Avg. response', render: (x) => (x.resp ? x.resp + ' h' : '—') },
+        { label: 'Buses', hideMobile: true, render: (x) => x.buses },
+        { label: 'Status', side: true, render: (x) => <Badge color={x.status === 'Live' ? 'green' : x.status === 'Onboarding' ? 'sun' : 'sky'}>{x.status}</Badge> },
+      ]} />
     </Panel>
   )
 }
@@ -91,8 +85,8 @@ export function ExamCrisis() {
   }
   return (
     <div className="space-y-4">
-      <div className="rounded-2xl bg-navy-800 p-5 text-white"><div className="flex items-center gap-2 text-sm font-bold text-sun-300"><Siren className="h-4 w-4" /> Government stakeholder view</div><div className="mt-1 font-display text-xl font-extrabold">Exam crisis management desk</div><p className="mt-1 max-w-3xl text-sm text-white/75">During paper leaks, cancellations or delays, boards and the district exam cell can reach every candidate and parent with one verified message. This cuts down rumours and anxiety.</p></div>
-      <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
+      <div className="rounded-2xl bg-primary p-5 text-white"><div className="flex items-center gap-2 text-sm font-bold text-sun-300"><Siren className="h-4 w-4" /> District exam cell</div><div className="mt-1 font-display text-xl font-extrabold">Exam crisis management desk</div><p className="mt-1 max-w-3xl text-sm text-white/75">During paper leaks, cancellations or delays, boards and the district exam cell can reach every candidate and parent with one verified message. This cuts down rumours and anxiety.</p></div>
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
         <Stat label="Exam-related questions today" value="611" icon={MessageCircleQuestion} tone="sky" />
         <Stat label="Rumours tracked" value="3" icon={AlertTriangle} tone="coral" />
         <Stat label="Clarification reach (last)" value="94%" sub="within 2 hours" icon={CheckCircle2} />
@@ -100,7 +94,7 @@ export function ExamCrisis() {
       </div>
       <div className="grid gap-4 xl:grid-cols-2">
         <Panel title="Rumour radar" sub="Clustered from help-desk & AI-tutor questions (anonymised)">
-          <div className="space-y-2">{rumours.map((r) => <div key={r.t} className="flex items-center gap-3 rounded-xl bg-slate-50 p-3"><div className="flex-1"><div className="text-sm font-semibold text-navy-800">{r.t}</div><div className="text-xs text-slate-500">{r.n} questions · {r.trend}</div></div><Badge color={r.tone}>{r.status}</Badge></div>)}</div>
+          <div className="space-y-2">{rumours.map((r) => <div key={r.t} className="flex items-center gap-3 rounded-xl bg-slate-50 p-3"><div className="flex-1"><div className="text-sm font-semibold text-foreground">{r.t}</div><div className="text-xs text-slate-500">{r.n} questions · {r.trend}</div></div><Badge color={r.tone}>{r.status}</Badge></div>)}</div>
         </Panel>
         <Panel title="Push official clarification">
           <textarea className={cx(inputCls, 'h-36 resize-none')} value={text} onChange={(e) => setText(e.target.value)} />
@@ -126,20 +120,20 @@ export function Partners() {
   return (
     <div className="space-y-4">
       <div className="grid gap-4 xl:grid-cols-[1.3fr_1fr]">
-        <Panel title="Revenue scenario calculator" sub="Year-3 illustrative scenario from the concept deck. Move the sliders to test assumptions.">
+        <Panel title="Revenue scenario calculator" sub="Year-3 planning scenario. Adjust the assumptions.">
           {[['Institutional partners (schools / districts / NGOs)', inst, setInst, 0, 300, 1, inst], ['Annual service fee per partner', fee, setFee, 10000, 300000, 5000, inr(fee)], ['CSR / grant partners', csr, setCsr, 0, 30, 1, csr], ['Average CSR grant per partner', grant, setGrant, 100000, 5000000, 100000, inr(grant)], ['Premium subscribers (₹75/mo career reports)', prem, setPrem, 0, 20000, 500, prem.toLocaleString('en-IN')]].map(([l, v, set, min, max, step, shown]) => (
             <div key={l} className="mb-4">
-              <div className="mb-1 flex justify-between text-sm"><span className="text-slate-600">{l}</span><b className="text-navy-800">{shown}</b></div>
+              <div className="mb-1 flex justify-between text-sm"><span className="text-slate-600">{l}</span><b className="text-foreground">{shown}</b></div>
               <input type="range" min={min} max={max} step={step} value={v} onChange={(e) => set(Number(e.target.value))} className="w-full accent-teal-600" />
             </div>
           ))}
           <div className="grid grid-cols-3 gap-2 rounded-2xl bg-slate-50 p-4 text-center">
-            <div><div className="text-xs text-slate-500">Institutional</div><div className="font-display text-lg font-extrabold text-navy-800">₹{cr(instRev)}</div></div>
-            <div><div className="text-xs text-slate-500">CSR / grants</div><div className="font-display text-lg font-extrabold text-navy-800">₹{cr(csrRev)}</div></div>
-            <div><div className="text-xs text-slate-500">Premium</div><div className="font-display text-lg font-extrabold text-navy-800">₹{cr(premRev)}</div></div>
+            <div><div className="text-xs text-slate-500">Institutional</div><div className="font-display text-lg font-extrabold text-foreground">₹{cr(instRev)}</div></div>
+            <div><div className="text-xs text-slate-500">CSR / grants</div><div className="font-display text-lg font-extrabold text-foreground">₹{cr(csrRev)}</div></div>
+            <div><div className="text-xs text-slate-500">Premium</div><div className="font-display text-lg font-extrabold text-foreground">₹{cr(premRev)}</div></div>
           </div>
-          <div className="mt-3 flex items-center justify-between rounded-2xl bg-navy-800 p-4 text-white"><span className="text-sm">Potential annual inflow</span><span className="font-display text-3xl font-extrabold text-sun-300">₹{cr(total)}</span></div>
-          <p className="mt-2 text-[11px] text-slate-400">Default = deck scenario: 100 × ₹1.5 lakh + 10 × ₹10 lakh = ₹2.5 Cr. Reality check from the research report: ₹2.5 Cr needs about 650 paying schools at ₹38k each (≈4% of Kerala schools), so treat it as a hypothesis to validate.</p>
+          <div className="mt-3 flex items-center justify-between rounded-2xl bg-primary p-4 text-white"><span className="text-sm">Potential annual inflow</span><span className="font-display text-3xl font-extrabold text-sun-300">₹{cr(total)}</span></div>
+          <p className="mt-2 text-[11px] text-muted-foreground">Base scenario: 100 partners × ₹1.5 lakh + 10 CSR partners × ₹10 lakh = ₹2.5 Cr a year.</p>
         </Panel>
         <div className="space-y-4">
           <Panel title="Revenue mix">
@@ -147,7 +141,7 @@ export function Partners() {
             <div className="space-y-1">{mix.map((m, i) => <div key={m.name} className="flex items-center gap-2 text-xs"><span className="h-2.5 w-2.5 rounded" style={{ background: ['#2f6bbf', '#26a69a', '#f6b93b'][i] }} /><span className="flex-1 text-slate-600">{m.name}</span><b>{total ? Math.round((m.value / total) * 100) : 0}%</b></div>)}</div>
           </Panel>
           <Panel title="Partner pipeline">
-            <div className="space-y-3">{pipeline.map(([l, v, t]) => <div key={l}><div className="mb-1 flex justify-between text-xs"><span className="font-medium text-navy-800">{l}</span><span className="text-slate-500">{v} / {t}</span></div><Progress value={(v / t) * 100} h={6} /></div>)}</div>
+            <div className="space-y-3">{pipeline.map(([l, v, t]) => <div key={l}><div className="mb-1 flex justify-between text-xs"><span className="font-medium text-foreground">{l}</span><span className="text-slate-500">{v} / {t}</span></div><Progress value={(v / t) * 100} h={6} /></div>)}</div>
           </Panel>
         </div>
       </div>
@@ -158,13 +152,13 @@ export function Partners() {
 export function Roadmap() {
   const gtm = [
     ['0–3 months', 'Discover', 'Interviewed 38 students, parents, teachers & NGO leaders. Mapped existing workflows.', 'done'],
-    ['3–6 months', 'Pilot', 'Clickable prototype co-designed · 7 schools onboarded · 21 local champions trained.', 'active'],
+    ['3–6 months', 'Pilot', 'App co-designed with schools · 7 schools onboarded · 21 local champions trained.', 'active'],
     ['6–12 months', 'Prove', 'Measure engagement, response time, satisfaction, safety & cost per learner.', 'next'],
     ['12–24 months', 'Scale', 'Repeat contracts & CSR funding · expand district by district with local languages.', 'next'],
   ]
   const phases = [
     ['Phase 1 · Foundation', ['Bus tracking & SOS', 'Verified notices', 'Attendance alerts', 'Secure teacher chat', 'Teacher-managed onboarding', 'Family profile switcher', 'Help desk & resource hub'], 'In pilot'],
-    ['Phase 2 · Intelligence', ['Voice-first assistant (ml / hi / en)', 'Age-adaptive AI tutor', 'Live & anonymous counselling', 'Talent wall', 'Vidya Coins', 'Better analytics'], 'Prototype'],
+    ['Phase 2 · Intelligence', ['Voice-first assistant (ml / hi / en)', 'Age-adaptive AI tutor', 'Live & anonymous counselling', 'Talent wall', 'Vidya Coins', 'Better analytics'], 'In testing'],
     ['Phase 3 · Ecosystem', ['Vidya Sethu Store', 'NGO sponsorship portal', 'Peer tutoring', 'Competitive exam modules', 'AI career pathways', 'Partner API & CSR resource centres'], 'Planned'],
   ]
   return (
@@ -174,7 +168,7 @@ export function Roadmap() {
           {gtm.map(([t, s, d, st]) => (
             <div key={s} className={cx('rounded-2xl p-4 ring-1', st === 'active' ? 'bg-teal-50 ring-teal-500' : 'bg-slate-50 ring-slate-100')}>
               <div className="flex items-center gap-2">{st === 'done' ? <CheckCircle2 className="h-5 w-5 text-teal-600" /> : st === 'active' ? <span className="h-3 w-3 animate-pulse rounded-full bg-teal-500" /> : <Circle className="h-5 w-5 text-slate-300" />}<span className="text-xs font-semibold text-slate-500">{t}</span></div>
-              <div className="mt-2 font-display text-lg font-extrabold text-navy-800">{s}</div>
+              <div className="mt-2 font-display text-lg font-extrabold text-foreground">{s}</div>
               <p className="mt-1 text-xs text-slate-600">{d}</p>
             </div>
           ))}

@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { CalendarCheck2, Check, ChevronRight, MessageSquareText, ShieldCheck } from 'lucide-react'
+import { AudioLines, CalendarCheck2, Check, ChevronRight, MessageSquareText, ShieldCheck } from 'lucide-react'
 import { Avatar, Badge, Button, Card, SectionTitle, Sheet, Tabs, Toggle, useToast } from '../../components/ui'
-import { MobileHeader, HeaderActions } from '../../components/MobileShell'
+import { HomeHeader, MobileHeader, HeaderActions } from '../../components/MobileShell'
 import { BusMiniCard, useSOS } from '../../features/BusRadar'
 import NoticeBoard, { NoticeCard, NoticeDetail, nTitle } from '../../features/NoticeBoard'
 import ExamCalendar, { ExamCountdown } from '../../features/ExamCalendar'
@@ -26,8 +26,8 @@ export function ChildSwitcher() {
         const c = USERS[id]
         const active = state.activeChild === id
         return (
-          <button key={id} onClick={() => mutate((d) => { d.activeChild = id })} className={cx('flex flex-1 items-center gap-2 rounded-2xl p-2 pr-3 text-left transition', active ? 'bg-navy-800 text-white shadow-float' : 'bg-white text-navy-800 shadow-card ring-1 ring-slate-900/5')}>
-            <Avatar emoji={c.avatar} color={active ? '#ffffff' : c.color} size={36} />
+          <button key={id} onClick={() => mutate((d) => { d.activeChild = id })} className={cx('flex flex-1 items-center gap-2 rounded-2xl p-2 pr-3 text-left transition', active ? 'bg-primary text-white shadow-float' : 'bg-card text-foreground shadow-card ring-1 ring-slate-900/5')}>
+            <Avatar name={c.name} color={c.color} size={36} ring={active} />
             <span className="min-w-0"><span className="block truncate text-sm font-bold">{c.short}</span><span className={cx('block text-[11px]', active ? 'text-white/70' : 'text-slate-500')}>Class {c.className}</span></span>
             {active && <Check className="ml-auto h-4 w-4 text-sun-300" />}
           </button>
@@ -71,19 +71,12 @@ export function ParentHome() {
 
   return (
     <div className="space-y-5 px-4 pb-4">
-      <div className="flex items-center gap-3 pt-1">
-        <Avatar emoji={user.avatar} color={user.color} size={46} />
-        <div className="min-w-0 flex-1">
-          <div className="text-xs text-slate-500">{translate(greeting(), lang)} 👋</div>
-          <div className="truncate font-display text-xl font-extrabold text-navy-800">{user.short}</div>
-        </div>
-        <HeaderActions userId={user.id} />
-      </div>
+      <HomeHeader greeting={translate(greeting(), lang)} name={user.short} userId={user.id} />
       <ChildSwitcher />
 
       <Card className="overflow-hidden bg-gradient-to-br from-navy-800 to-navy-600 p-4 text-white ring-0">
         <div className="flex items-start gap-3">
-          <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-white/10 text-2xl">🔊</div>
+          <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-white/10"><AudioLines className="h-6 w-6 text-sun-300" /></div>
           <div className="min-w-0 flex-1">
             <div className="font-display text-base font-extrabold">{translate('todaySummary', lang)}</div>
             <p className="mt-1 line-clamp-3 text-xs text-white/75">{summary}</p>
@@ -101,7 +94,7 @@ export function ParentHome() {
         </Card>
         <Card onClick={() => nav('/parent/notices')} className="p-3.5">
           <div className="text-[11px] font-semibold text-slate-500">New notices</div>
-          <div className="mt-1 font-display text-lg font-extrabold text-navy-800">{unread} unread</div>
+          <div className="mt-1 font-display text-lg font-extrabold text-foreground">{unread} unread</div>
           <div className="text-[11px] text-slate-400">All school-verified ✓</div>
         </Card>
       </div>
@@ -121,7 +114,7 @@ export function ParentHome() {
           {hw.map((h) => (
             <div key={h.id} className="flex items-center gap-3 p-3.5">
               <span className={cx('grid h-6 w-6 shrink-0 place-items-center rounded-full', h.done ? 'bg-teal-500' : 'bg-slate-200')}>{h.done && <Check className="h-3.5 w-3.5 text-white" strokeWidth={3} />}</span>
-              <div className="min-w-0 flex-1"><div className="truncate text-[13px] font-semibold text-navy-800">{h.title}</div><div className="text-[11px] text-slate-500">{h.subject} · due in {Math.max(0, daysUntil(h.due))} day(s)</div></div>
+              <div className="min-w-0 flex-1"><div className="truncate text-[13px] font-semibold text-foreground">{h.title}</div><div className="text-[11px] text-slate-500">{h.subject} · due in {Math.max(0, daysUntil(h.due))} day(s)</div></div>
               <Badge color={h.done ? 'green' : 'sun'}>{h.done ? 'Done' : 'Pending'}</Badge>
             </div>
           ))}
@@ -131,14 +124,14 @@ export function ParentHome() {
       {urgentSch && (
         <Card onClick={() => nav('/parent/support')} className="flex items-center gap-3 p-4 ring-coral-500/30">
           <div className="grid h-11 w-11 place-items-center rounded-xl bg-coral-50 text-xl">🎓</div>
-          <div className="min-w-0 flex-1"><div className="text-[13px] font-bold text-navy-800">{urgentSch.name}</div><div className="text-[11px] text-coral-600">{daysUntil(urgentSch.deadline)} days left · {urgentSch.status}</div></div>
+          <div className="min-w-0 flex-1"><div className="text-[13px] font-bold text-foreground">{urgentSch.name}</div><div className="text-[11px] text-coral-600">{daysUntil(urgentSch.deadline)} days left · {urgentSch.status}</div></div>
           <ChevronRight className="h-4 w-4 text-slate-300" />
         </Card>
       )}
 
       <div className="grid grid-cols-2 gap-3">
-        <Card onClick={() => nav('/parent/chat')} className="p-3.5"><MessageSquareText className="h-6 w-6 text-teal-600" /><div className="mt-1.5 text-[13px] font-bold text-navy-800">Message class teacher</div><div className="text-[11px] text-slate-500">Fathima N. · masked</div></Card>
-        <Card onClick={() => nav('/parent/support')} className="p-3.5"><CalendarCheck2 className="h-6 w-6 text-coral-500" /><div className="mt-1.5 text-[13px] font-bold text-navy-800">{translate('community_support', lang)}</div><div className="text-[11px] text-slate-500">Scholarships · kits · help</div></Card>
+        <Card onClick={() => nav('/parent/chat')} className="p-3.5"><MessageSquareText className="h-6 w-6 text-teal-600" /><div className="mt-1.5 text-[13px] font-bold text-foreground">Message class teacher</div><div className="text-[11px] text-slate-500">Fathima N. · masked</div></Card>
+        <Card onClick={() => nav('/parent/support')} className="p-3.5"><CalendarCheck2 className="h-6 w-6 text-coral-500" /><div className="mt-1.5 text-[13px] font-bold text-foreground">{translate('community_support', lang)}</div><div className="text-[11px] text-slate-500">Scholarships · kits · help</div></Card>
       </div>
       <NoticeDetail n={notice && state.notices.find((x) => x.id === notice.id)} onClose={() => setNotice(null)} onAsk={() => nav('/parent/support')} />
     </div>
@@ -153,7 +146,7 @@ export function ParentNotices() {
   return (
     <div>
       <MobileHeader title={translate('notices', state.lang)} sub="Only verified school, government & partner notices" right={<HeaderActions userId={user.id} />}>
-        <Tabs className="mt-3" value={tab} onChange={setTab} tabs={[{ value: 'board', label: '📢 Notice board' }, { value: 'calendar', label: '📅 Exam calendar' }]} />
+        <Tabs className="mt-3" value={tab} onChange={setTab} tabs={[{ value: 'board', label: 'Notice board' }, { value: 'calendar', label: 'Exam calendar' }]} />
       </MobileHeader>
       {tab === 'board' ? <NoticeBoard onAsk={(n) => setAsk(n)} /> : <div className="px-4"><ExamCalendar /></div>}
       <NewRequest open={!!ask} onClose={() => setAsk(null)} preset={ask && { category: 'Exam', title: 'Question about: ' + nTitle(ask, 'en') }} />
@@ -182,7 +175,7 @@ export function ParentSupport() {
   return (
     <div>
       <MobileHeader title={translate('community_support', state.lang)} sub="Help desk · scholarships · CSR kits · rights" right={<HeaderActions userId={user.id} />}>
-        <Tabs className="mt-3" value={tab} onChange={setTab} tabs={[{ value: 'help', label: '🙋 Help desk' }, { value: 'sch', label: '🎓 Scholarships' }, { value: 'kits', label: '📦 Kits' }, { value: 'privacy', label: '🔒 Privacy' }]} />
+        <Tabs className="mt-3" value={tab} onChange={setTab} tabs={[{ value: 'help', label: 'Help desk' }, { value: 'sch', label: 'Scholarships' }, { value: 'kits', label: 'Book kits' }, { value: 'privacy', label: 'Privacy' }]} />
       </MobileHeader>
       <div className="px-4">
         {tab === 'help' && <HelpDesk />}
@@ -211,13 +204,13 @@ export function ParentChat() {
   const [ptm, setPtm] = useState(false)
   const t = TEACHERS[0]
   return (
-    <div className="flex h-full flex-col">
-      <MobileHeader title={t.name} sub={`Class teacher 9-B · chat hours ${t.window}`} right={<Button size="sm" variant="soft" onClick={() => setPtm(true)}>Book PTM call</Button>} />
-      <SecureChat threadId="parent-fathima" me={user} other={{ ...t, role: 'teacher' }} height="h-[calc(100dvh-210px)] md:h-[640px]" />
+    <div className="flex min-h-0 flex-1 flex-col">
+      <MobileHeader back="/parent" title={t.name} sub={`Class teacher 9-B · chat hours ${t.window}`} right={<Button size="sm" variant="soft" onClick={() => setPtm(true)}>Book call</Button>} />
+      <SecureChat threadId="parent-fathima" me={user} other={{ ...t, role: 'teacher' }} height="min-h-0 flex-1" />
       <Sheet open={ptm} onClose={() => setPtm(false)} title="Can’t come to PTM? Book a call">
         <p className="mb-3 text-sm text-slate-600">Friday’s PTM is at 2:30 PM. If you can’t attend, pick a 10-minute masked call slot with Fathima teacher.</p>
         <div className="grid grid-cols-2 gap-2">
-          {['Fri 4:00 PM', 'Fri 4:15 PM', 'Fri 4:30 PM', 'Sat 10:00 AM'].map((s) => <button key={s} onClick={() => { setPtm(false); toast(`PTM call booked: ${s}`, '📞') }} className="rounded-xl p-3 text-sm font-semibold text-navy-800 ring-1 ring-slate-200 hover:bg-teal-50">{s}</button>)}
+          {['Fri 4:00 PM', 'Fri 4:15 PM', 'Fri 4:30 PM', 'Sat 10:00 AM'].map((s) => <button key={s} onClick={() => { setPtm(false); toast(`PTM call booked: ${s}`, '📞') }} className="rounded-xl p-3 text-sm font-semibold text-foreground ring-1 ring-slate-200 hover:bg-teal-50">{s}</button>)}
         </div>
         <p className="mt-3 text-[11px] text-slate-400">{state.lang === 'ml' ? 'കോൾ മലയാളത്തിൽ.' : 'The call can be in Malayalam, English or Hindi.'}</p>
       </Sheet>

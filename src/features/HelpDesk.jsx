@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ChevronRight, ShieldAlert } from 'lucide-react'
+import { Backpack, BookOpen, FileText, GraduationCap, HeartHandshake, Languages, LifeBuoy, ShieldCheck, ChevronRight, ShieldAlert } from 'lucide-react'
 import { Badge, Button, Card, Field, SectionTitle, Sheet, Steps, inputCls, useToast } from '../components/ui'
 import { MicButton } from './Voice'
 import { useSession, useStore } from '../store/Store'
@@ -7,13 +7,13 @@ import { USERS } from '../data/seed'
 import { cx, timeAgo } from '../lib/utils'
 
 export const CATEGORIES = [
-  { id: 'Academic', icon: '📚', label: 'Studies & homework', route: 'Class teacher', to: 'fathima' },
-  { id: 'Exam', icon: '📝', label: 'Exam information', route: 'Exam cell', to: 'principal' },
-  { id: 'Resources', icon: '🎒', label: 'Books, uniform, devices', route: 'School office + NGO desk', to: 'principal' },
-  { id: 'Scholarship', icon: '🎓', label: 'Scholarship / fees', route: 'Scholarship helpdesk', to: 'principal' },
-  { id: 'Wellbeing', icon: '💚', label: 'Stress or worries', route: 'School counsellor', to: 'counselor' },
-  { id: 'Safety', icon: '🛡️', label: 'Safety concern', route: 'Principal (safeguarding lead)', to: 'principal' },
-  { id: 'Language', icon: '🗣️', label: 'Need help in my language', route: 'Community volunteer', to: 'admin' },
+  { id: 'Academic', icon: BookOpen, label: 'Studies & homework', route: 'Class teacher', to: 'fathima' },
+  { id: 'Exam', icon: FileText, label: 'Exam information', route: 'Exam cell', to: 'principal' },
+  { id: 'Resources', icon: Backpack, label: 'Books, uniform, devices', route: 'School office + NGO desk', to: 'principal' },
+  { id: 'Scholarship', icon: GraduationCap, label: 'Scholarship / fees', route: 'Scholarship helpdesk', to: 'principal' },
+  { id: 'Wellbeing', icon: HeartHandshake, label: 'Stress or worries', route: 'School counsellor', to: 'counselor' },
+  { id: 'Safety', icon: ShieldCheck, label: 'Safety concern', route: 'Principal (safeguarding lead)', to: 'principal' },
+  { id: 'Language', icon: Languages, label: 'Need help in my language', route: 'Community volunteer', to: 'admin' },
 ]
 
 const STATUS_COLOR = { New: 'sky', 'In progress': 'sun', Resolved: 'green', Escalated: 'red' }
@@ -21,9 +21,9 @@ const STATUS_COLOR = { New: 'sky', 'In progress': 'sun', Resolved: 'green', Esca
 export function RequestCard({ r, onOpen }) {
   return (
     <Card onClick={onOpen} className="flex items-center gap-3 p-3.5">
-      <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-slate-50 text-xl">{CATEGORIES.find((c) => c.id === r.category)?.icon || '🙋'}</div>
+      {(() => { const I = CATEGORIES.find((c) => c.id === r.category)?.icon || LifeBuoy; return <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-teal-50 text-teal-600"><I className="h-5 w-5" /></div> })()}
       <div className="min-w-0 flex-1">
-        <div className="truncate text-[13.5px] font-semibold text-navy-800">{r.title}</div>
+        <div className="truncate text-[13.5px] font-semibold text-foreground">{r.title}</div>
         <div className="text-[11px] text-slate-500">{r.id} · {r.assigned} · {timeAgo(r.createdAt)}</div>
       </div>
       <Badge color={STATUS_COLOR[r.status] || 'slate'}>{r.status}</Badge>
@@ -37,7 +37,7 @@ export function RequestDetail({ r, onClose }) {
   return (
     <Sheet open={!!r} onClose={onClose} title={r.id}>
       <div className="flex flex-wrap gap-1.5"><Badge color={STATUS_COLOR[r.status]}>{r.status}</Badge><Badge>{r.category}</Badge></div>
-      <h3 className="mt-2 font-display text-lg font-bold text-navy-800">{r.title}</h3>
+      <h3 className="mt-2 font-display text-lg font-bold text-foreground">{r.title}</h3>
       <p className="mt-1 text-sm text-slate-600">{r.detail}</p>
       <div className="mt-3 rounded-xl bg-slate-50 p-3 text-xs text-slate-600">Routed to <b>{r.assigned}</b> · For {r.child}</div>
       <div className="mt-4"><SectionTitle>Progress</SectionTitle>
@@ -76,8 +76,8 @@ export function NewRequest({ open, onClose, preset }) {
           <div className="grid grid-cols-2 gap-2">
             {CATEGORIES.map((c) => (
               <button key={c.id} onClick={() => setCat(c.id)} className="rounded-2xl bg-slate-50 p-3 text-left ring-1 ring-slate-200 hover:bg-teal-50 hover:ring-teal-400">
-                <div className="text-2xl">{c.icon}</div>
-                <div className="mt-1 text-[13px] font-semibold text-navy-800">{c.label}</div>
+                <div className="grid h-10 w-10 place-items-center rounded-xl bg-card text-teal-600 shadow-soft"><c.icon className="h-5 w-5" /></div>
+                <div className="mt-1 text-[13px] font-semibold text-foreground">{c.label}</div>
                 <div className="text-[10px] text-slate-500">→ {c.route}</div>
               </button>
             ))}
@@ -86,7 +86,7 @@ export function NewRequest({ open, onClose, preset }) {
       ) : (
         <>
           <button onClick={() => setCat(null)} className="mb-3 text-xs font-semibold text-teal-600">← Change category</button>
-          <div className="mb-3 flex items-center gap-2 rounded-xl bg-slate-50 p-3 text-sm"><span className="text-xl">{CATEGORIES.find((c) => c.id === cat).icon}</span><b className="text-navy-800">{cat}</b> <span className="text-xs text-slate-500">→ {CATEGORIES.find((c) => c.id === cat).route}</span></div>
+          <div className="mb-3 flex items-center gap-2 rounded-xl bg-slate-50 p-3 text-sm">{(() => { const I = CATEGORIES.find((c) => c.id === cat).icon; return <I className="h-5 w-5 text-teal-600" /> })()}<b className="text-foreground">{cat}</b> <span className="text-xs text-slate-500">→ {CATEGORIES.find((c) => c.id === cat).route}</span></div>
           <Field label="Short title"><input className={inputCls} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Need Physics textbook" /></Field>
           <Field label="Tell us more (type or speak)">
             <div className="flex gap-2">
@@ -95,7 +95,7 @@ export function NewRequest({ open, onClose, preset }) {
             </div>
           </Field>
           {cat === 'Safety' && <div className="flex gap-2 rounded-xl bg-red-50 p-3 text-xs text-red-700"><ShieldAlert className="h-4 w-4 shrink-0" /> Safety concerns go directly to the principal (safeguarding lead) and are handled confidentially. In an emergency call 112 or Childline 1098.</div>}
-          {cat === 'Wellbeing' && <div className="rounded-xl bg-violet-50 p-3 text-xs text-violet-700">💚 Only the school counsellor can read this. You can also ask anonymously from the Wellbeing section.</div>}
+          {cat === 'Wellbeing' && <div className="rounded-xl bg-violet-50 p-3 text-xs text-violet-700">Only the school counsellor can read this. You can also ask anonymously from the Wellbeing section.</div>}
         </>
       )}
     </Sheet>
@@ -110,7 +110,7 @@ export default function HelpDesk({ compact }) {
   const mine = state.requests.filter((r) => r.by === user.id)
   return (
     <div className="space-y-3">
-      <Card className="bg-gradient-to-br from-teal-500 to-teal-700 p-4 text-white ring-0">
+      <Card className="bg-gradient-to-br from-[#26a69a] to-[#186f68] p-4 text-white ring-0">
         <div className="text-lg font-display font-extrabold">Need help? Ask us.</div>
         <p className="mt-1 text-xs text-white/85">Studies, books, exams, scholarships, safety or worries. We route your request to the right person and you can track every step.</p>
         <Button variant="sun" className="mt-3" onClick={() => setOpen(true)}>+ New request</Button>
@@ -119,7 +119,7 @@ export default function HelpDesk({ compact }) {
         <>
           <SectionTitle>My requests ({mine.length})</SectionTitle>
           <div className="space-y-2">
-            {mine.length === 0 && <div className="rounded-xl bg-white p-4 text-center text-sm text-slate-500 ring-1 ring-slate-100">No requests yet</div>}
+            {mine.length === 0 && <div className="rounded-xl bg-card p-4 text-center text-sm text-slate-500 ring-1 ring-slate-100">No requests yet</div>}
             {mine.map((r) => <RequestCard key={r.id} r={r} onOpen={() => setDetail(r)} />)}
           </div>
         </>

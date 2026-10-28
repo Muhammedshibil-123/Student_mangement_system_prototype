@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { EyeOff, Phone } from 'lucide-react'
-import { Badge, Button, Card, Field, SectionTitle, Sheet, inputCls, useToast } from '../components/ui'
+import { CalendarPlus, EyeOff, Headphones, Phone, Wind } from 'lucide-react'
+import { Avatar, Badge, Button, Card, Field, SectionTitle, Sheet, inputCls, useToast } from '../components/ui'
 import { useSession, useStore } from '../store/Store'
 import { cx, fmtDate, fmtTime, uid } from '../lib/utils'
 
@@ -54,7 +54,7 @@ export default function Wellbeing() {
 
   return (
     <div className="space-y-4">
-      <Card className="bg-gradient-to-br from-violet-500 to-violet-700 p-4 text-white ring-0">
+      <Card className="bg-gradient-to-br from-[#8b5cf6] to-[#6d28d9] p-4 text-white ring-0">
         <div className="text-xs font-semibold text-white/80">Daily check-in</div>
         <div className="font-display text-lg font-extrabold">How are you feeling today?</div>
         <div className="mt-3 flex justify-between">
@@ -67,10 +67,10 @@ export default function Wellbeing() {
       </Card>
 
       <div className="grid grid-cols-2 gap-3">
-        <Card onClick={() => setBreath(true)} className="p-4"><div className="text-2xl">🫁</div><div className="mt-1 text-sm font-bold text-navy-800">1-min breathing</div><div className="text-[11px] text-slate-500">Calm exam nerves</div></Card>
-        <Card onClick={() => setAsk(true)} className="p-4"><div className="text-2xl">🕶️</div><div className="mt-1 text-sm font-bold text-navy-800">Ask anonymously</div><div className="text-[11px] text-slate-500">Your name stays hidden</div></Card>
-        <Card onClick={() => setBook(true)} className="p-4"><div className="text-2xl">🗓️</div><div className="mt-1 text-sm font-bold text-navy-800">Book counsellor</div><div className="text-[11px] text-slate-500">Dr. Lakshmi Prabha</div></Card>
-        <Card className="p-4"><div className="text-2xl">🎧</div><div className="mt-1 text-sm font-bold text-navy-800">Exam-calm audio</div><div className="text-[11px] text-slate-500">5 min · Malayalam</div></Card>
+        <Card onClick={() => setBreath(true)} className="p-4"><div className="grid h-11 w-11 place-items-center rounded-2xl bg-teal-50 text-teal-600"><Wind className="h-5 w-5" /></div><div className="mt-2.5 text-sm font-bold text-foreground">1-min breathing</div><div className="text-[11px] text-slate-500">Calm exam nerves</div></Card>
+        <Card onClick={() => setAsk(true)} className="p-4"><div className="grid h-11 w-11 place-items-center rounded-2xl bg-violet-50 text-violet-600"><EyeOff className="h-5 w-5" /></div><div className="mt-2.5 text-sm font-bold text-foreground">Ask anonymously</div><div className="text-[11px] text-slate-500">Your name stays hidden</div></Card>
+        <Card onClick={() => setBook(true)} className="p-4"><div className="grid h-11 w-11 place-items-center rounded-2xl bg-sky-50 text-sky-600"><CalendarPlus className="h-5 w-5" /></div><div className="mt-2.5 text-sm font-bold text-foreground">Book counsellor</div><div className="text-[11px] text-slate-500">Dr. Lakshmi Prabha</div></Card>
+        <Card className="p-4"><div className="grid h-11 w-11 place-items-center rounded-2xl bg-sun-50 text-sun-600"><Headphones className="h-5 w-5" /></div><div className="mt-2.5 text-sm font-bold text-foreground">Exam-calm audio</div><div className="text-[11px] text-slate-500">5 min · Malayalam</div></Card>
       </div>
 
       <div>
@@ -78,8 +78,8 @@ export default function Wellbeing() {
         <div className="space-y-2">
           {state.sessions.filter((s) => s.who.startsWith('Group') || s.who.startsWith('Parents') || s.mine === user.id).map((s) => (
             <Card key={s.id} className="flex items-center gap-3 p-3">
-              <div className="w-12 shrink-0 rounded-xl bg-violet-50 py-1.5 text-center"><div className="text-[10px] font-bold uppercase text-violet-500">{fmtDate(s.at, { month: 'short' })}</div><div className="font-display text-lg font-extrabold leading-none text-navy-800">{new Date(s.at).getDate()}</div></div>
-              <div className="min-w-0 flex-1"><div className="text-[13px] font-semibold text-navy-800">{s.title}</div><div className="text-[11px] text-slate-500">{fmtTime(s.at)} · {s.mode}</div></div>
+              <div className="w-12 shrink-0 rounded-xl bg-violet-50 py-1.5 text-center"><div className="text-[10px] font-bold uppercase text-violet-500">{fmtDate(s.at, { month: 'short' })}</div><div className="font-display text-lg font-extrabold leading-none text-foreground">{new Date(s.at).getDate()}</div></div>
+              <div className="min-w-0 flex-1"><div className="text-[13px] font-semibold text-foreground">{s.title}</div><div className="text-[11px] text-slate-500">{fmtTime(s.at)} · {s.mode}</div></div>
             </Card>
           ))}
         </div>
@@ -97,24 +97,24 @@ export default function Wellbeing() {
       <Card className="p-4">
         <SectionTitle>Free helplines (24×7)</SectionTitle>
         {[['Tele-MANAS (mental health)', '14416'], ['Childline', '1098'], ['Emergency', '112']].map(([n, p]) => (
-          <div key={p} className="flex items-center justify-between border-b border-slate-100 py-2 last:border-0"><span className="text-sm text-navy-800">{n}</span><a href={`tel:${p}`} className="flex items-center gap-1 rounded-full bg-teal-50 px-3 py-1 text-xs font-bold text-teal-700"><Phone className="h-3 w-3" />{p}</a></div>
+          <div key={p} className="flex items-center justify-between border-b border-slate-100 py-2 last:border-0"><span className="text-sm text-foreground">{n}</span><a href={`tel:${p}`} className="flex items-center gap-1 rounded-full bg-teal-50 px-3 py-1 text-xs font-bold text-teal-700"><Phone className="h-3 w-3" />{p}</a></div>
         ))}
         <p className="mt-2 text-[11px] text-slate-400">Vidya Sethu is not a clinical or emergency service. Sensitive issues are escalated to trained humans.</p>
       </Card>
 
       <Sheet open={breath} onClose={() => setBreath(false)} title="Breathing break"><Breathing onClose={() => setBreath(false)} /></Sheet>
       <Sheet open={ask} onClose={() => setAsk(false)} title="Ask the counsellor anonymously" footer={<Button className="w-full" variant="primary" disabled={!q.trim()} onClick={sendQ} icon={EyeOff}>Send anonymously</Button>}>
-        <div className="mb-3 rounded-xl bg-violet-50 p-3 text-xs text-violet-800">🔒 The counsellor sees only “Student #A-xxx” and your class. If something sounds dangerous, a trained adult will reach out to keep you safe.</div>
+        <div className="mb-3 rounded-xl bg-violet-50 p-3 text-xs text-violet-800">The counsellor sees only “Student #A-xxx” and your class. If something sounds dangerous, a trained adult will reach out to keep you safe.</div>
         <Field label="Topic">
           <select className={inputCls} value={topic} onChange={(e) => setTopic(e.target.value)}>{['Exam stress', 'Friendship', 'Home', 'Body & health', 'Bullying', 'Career worry', 'Something else'].map((t) => <option key={t}>{t}</option>)}</select>
         </Field>
         <Field label="Your question"><textarea className={cx(inputCls, 'h-28 resize-none')} value={q} onChange={(e) => setQ(e.target.value)} placeholder="Write what is on your mind…" /></Field>
       </Sheet>
       <Sheet open={book} onClose={() => setBook(false)} title="Book a 1:1 session">
-        <div className="mb-3 flex items-center gap-3 rounded-xl bg-slate-50 p-3"><span className="text-3xl">🧑🏽‍⚕️</span><div><div className="font-semibold text-navy-800">Dr. Lakshmi Prabha</div><div className="text-xs text-slate-500">School counsellor · Mon–Fri</div></div></div>
+        <div className="mb-3 flex items-center gap-3 rounded-xl bg-slate-50 p-3"><Avatar name="Lakshmi Prabha" color="#8b5cf6" size={44} /><div><div className="font-semibold text-foreground">Dr. Lakshmi Prabha</div><div className="text-xs text-slate-500">School counsellor · Mon–Fri</div></div></div>
         <div className="grid grid-cols-2 gap-2">
           {['Tomorrow 11:15 AM', 'Tomorrow 3:00 PM', 'Fri 12:00 PM', 'Fri 2:15 PM'].map((s) => (
-            <button key={s} onClick={() => { mutate((d, { notify }) => { d.sessions.push({ id: uid('ss'), who: 'Student (private)', title: '1:1 session (booked in app)', at: new Date(Date.now() + 86400000).toISOString(), mode: 'Counsellor room', seats: '1:1', mine: user.id }); notify('counselor', `New 1:1 booking: ${s}`, '🗓️') }); toast(`Booked: ${s}. Only you and the counsellor can see this.`, '🗓️'); setBook(false) }} className="rounded-xl bg-white p-3 text-sm font-semibold text-navy-800 ring-1 ring-slate-200 hover:bg-violet-50 hover:ring-violet-400">{s}</button>
+            <button key={s} onClick={() => { mutate((d, { notify }) => { d.sessions.push({ id: uid('ss'), who: 'Student (private)', title: '1:1 session (booked in app)', at: new Date(Date.now() + 86400000).toISOString(), mode: 'Counsellor room', seats: '1:1', mine: user.id }); notify('counselor', `New 1:1 booking: ${s}`, '🗓️') }); toast(`Booked: ${s}. Only you and the counsellor can see this.`, '🗓️'); setBook(false) }} className="rounded-xl bg-card p-3 text-sm font-semibold text-foreground ring-1 ring-slate-200 hover:bg-violet-50 hover:ring-violet-400">{s}</button>
           ))}
         </div>
       </Sheet>

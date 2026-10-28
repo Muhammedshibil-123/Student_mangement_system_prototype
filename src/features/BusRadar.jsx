@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { AlertTriangle, BadgeCheck, Bell, Clock, Gauge, Phone, RotateCcw, ShieldAlert, UserRound } from 'lucide-react'
 import { BusMap, STOP_FRAC, useBus } from '../components/BusMap'
-import { Badge, Button, Card, SectionTitle, Sheet, Toggle, useToast } from '../components/ui'
+import { Avatar, Badge, Button, Card, SectionTitle, Sheet, Toggle, useToast } from '../components/ui'
 import { MobileHeader, HeaderActions } from '../components/MobileShell'
 import { useSession, useStore } from '../store/Store'
 import { BUS, USERS } from '../data/seed'
@@ -90,10 +90,10 @@ export default function BusRadar({ role = 'parent' }) {
         <Card className="overflow-hidden">
           <div className="relative">
             <BusMap bus={bus} className="block h-auto w-full" />
-            <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-bold text-navy-800 shadow">
+            <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-card/95 px-2.5 py-1 text-[11px] font-bold text-foreground shadow">
               <span className={cx('h-2 w-2 rounded-full', bus.idle ? 'bg-slate-400' : 'animate-pulse bg-emerald-500')} /> {bus.idle ? 'Offline' : translate('liveTracking', lang)}
             </div>
-            <div className="absolute right-3 top-3 rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-semibold text-slate-600 shadow">
+            <div className="absolute right-3 top-3 rounded-full bg-card/95 px-2.5 py-1 text-[11px] font-semibold text-slate-600 shadow">
               <Gauge className="mr-1 inline h-3 w-3" />{bus.speed} km/h
             </div>
           </div>
@@ -101,7 +101,7 @@ export default function BusRadar({ role = 'parent' }) {
             <div className="flex items-end justify-between gap-3">
               <div>
                 <div className="text-xs font-medium text-slate-500">{bus.passedHome || bus.idle || bus.arrived ? 'Status' : `${translate('busArriving', lang)} · Athavanad Market`}</div>
-                <div className="font-display text-3xl font-extrabold text-navy-800">{statusText}</div>
+                <div className="font-display text-3xl font-extrabold text-foreground">{statusText}</div>
               </div>
               <div className="text-right text-[11px] text-slate-400">Updated<br /><span className="font-semibold text-slate-600">{new Date(bus.now).toLocaleTimeString('en-IN')}</span></div>
             </div>
@@ -122,9 +122,9 @@ export default function BusRadar({ role = 'parent' }) {
         <div className="grid grid-cols-[1fr_auto] items-center gap-3">
           <Card className="p-3">
             <div className="flex items-center gap-3">
-              <div className="grid h-12 w-12 place-items-center rounded-full bg-sun-50 text-2xl">{driver.avatar}</div>
+              <Avatar name={driver.name} color="#e9a21c" size={48} />
               <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-1 text-sm font-bold text-navy-800">{driver.name} <BadgeCheck className="h-4 w-4 fill-teal-500 text-white" /></div>
+                <div className="flex items-center gap-1 text-sm font-bold text-foreground">{driver.name} <BadgeCheck className="h-4 w-4 fill-teal-500 text-white" /></div>
                 <div className="text-[11px] text-slate-500">Driver · {driver.exp} · Police verified</div>
                 <div className="text-[11px] text-slate-500">Attender: {BUS.attender}</div>
               </div>
@@ -142,10 +142,10 @@ export default function BusRadar({ role = 'parent' }) {
               const isNext = !bus.idle && !bus.arrived && i === bus.nextIdx
               return (
                 <li key={s.id} className="mb-3 ml-4 last:mb-0">
-                  <span className={cx('absolute -left-[9px] mt-0.5 h-4 w-4 rounded-full border-2', passed ? 'border-teal-500 bg-teal-500' : isNext ? 'border-sun-500 bg-white' : 'border-slate-300 bg-white')} />
+                  <span className={cx('absolute -left-[9px] mt-0.5 h-4 w-4 rounded-full border-2', passed ? 'border-teal-500 bg-teal-500' : isNext ? 'border-sun-500 bg-card' : 'border-slate-300 bg-card')} />
                   <div className="flex items-center justify-between gap-2">
                     <div>
-                      <div className={cx('text-[13px]', passed ? 'text-slate-500' : 'font-semibold text-navy-800')}>{lang === 'ml' ? s.ml : s.name} {s.isHome && <Badge color="sun">Your stop</Badge>}</div>
+                      <div className={cx('text-[13px]', passed ? 'text-slate-500' : 'font-semibold text-foreground')}>{lang === 'ml' ? s.ml : s.name} {s.isHome && <Badge color="sun">Your stop</Badge>}</div>
                       <div className="text-[11px] text-slate-400">Scheduled {s.t} AM{s.students ? ` · ${s.students} students` : ''}</div>
                     </div>
                     <div className="text-right text-xs font-semibold">{passed ? <span className="text-teal-600">Passed ✓</span> : bus.idle ? <span className="text-slate-400">—</span> : <span className={isNext ? 'text-sun-600' : 'text-slate-500'}>{bus.eta(i)} min</span>}</div>
@@ -162,14 +162,13 @@ export default function BusRadar({ role = 'parent' }) {
           <div className="mt-2 flex items-center gap-2 rounded-xl bg-slate-50 p-3 text-[11px] text-slate-500">
             <ShieldAlert className="h-4 w-4 shrink-0 text-slate-400" /> Location is shared only during school trips and only with families on this route.
           </div>
-          <button onClick={() => mutate((d) => { d.trip = { ...d.trip, status: 'running', startedAt: Date.now(), delayMin: 0, delayReason: '', boarded: {} }; d.alertsSent = {} })} className="mt-3 flex items-center gap-1.5 text-xs font-semibold text-teal-600"><RotateCcw className="h-3.5 w-3.5" /> Replay demo trip from Edayur</button>
         </Card>
       </div>
 
       <Sheet open={callOpen} onClose={() => setCallOpen(false)} title="Masked call">
         <div className="text-center">
-          <div className="mx-auto grid h-20 w-20 place-items-center rounded-full bg-teal-50 text-4xl">{driver.avatar}</div>
-          <div className="mt-3 font-bold text-navy-800">{driver.name}</div>
+          <div className="flex justify-center"><Avatar name={driver.name} color="#e9a21c" size={76} /></div>
+          <div className="mt-3 font-bold text-foreground">{driver.name}</div>
           <div className="text-sm text-slate-500">{maskPhone(driver.phone)}</div>
           <p className="mx-auto mt-3 max-w-xs text-xs text-slate-500">Calls are connected through the Vidya Sethu bridge number. Neither side sees the other’s personal phone number.</p>
           <div className="mt-5 grid grid-cols-2 gap-2">
@@ -189,13 +188,13 @@ export function BusMiniCard({ onOpen, childName }) {
   return (
     <Card onClick={onOpen} className="overflow-hidden">
       <div className="flex">
-        <div className="w-[42%] shrink-0 bg-[#eef3ea]"><BusMap bus={bus} compact className="h-full w-full" /></div>
+        <div className="w-[42%] shrink-0 map-box"><BusMap bus={bus} compact className="h-full w-full" /></div>
         <div className="flex-1 p-3.5">
           <div className="flex items-center gap-1.5 text-[11px] font-bold text-emerald-600"><span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" /> {BUS.route} · LIVE</div>
-          {bus.idle ? <div className="mt-1 font-display text-lg font-extrabold text-navy-800">Not started</div>
-            : bus.arrived ? <div className="mt-1 font-display text-lg font-extrabold text-navy-800">At school ✓</div>
-              : bus.passedHome ? <div className="mt-1 font-display text-lg font-extrabold text-navy-800">On the way to school</div>
-                : <div className="mt-1 font-display text-2xl font-extrabold text-navy-800">{eta} min</div>}
+          {bus.idle ? <div className="mt-1 font-display text-lg font-extrabold text-foreground">Not started</div>
+            : bus.arrived ? <div className="mt-1 font-display text-lg font-extrabold text-foreground">At school ✓</div>
+              : bus.passedHome ? <div className="mt-1 font-display text-lg font-extrabold text-foreground">On the way to school</div>
+                : <div className="mt-1 font-display text-2xl font-extrabold text-foreground">{eta} min</div>}
           <div className="text-[11px] text-slate-500">{bus.passedHome || bus.arrived ? `Next: ${BUS.stops[bus.nextIdx].name}` : 'to Athavanad Market (your stop)'}</div>
           {state.trip.delayMin > 0 && <div className="mt-1 text-[11px] font-semibold text-sun-600">⚠ +{state.trip.delayMin} min delay</div>}
           {childName && state.trip.boarded[childName] && <div className="mt-1 text-[11px] font-semibold text-teal-600">✓ {childName.split(' ')[0]} on board</div>}

@@ -24,7 +24,7 @@ export function AttendanceHeatmap({ studentId }) {
     <Card className="p-4">
       <div className="flex items-center justify-between">
         <SectionTitle className="!mb-0">Attendance</SectionTitle>
-        <div className="text-right"><span className="font-display text-xl font-extrabold text-navy-800">{pct}%</span><div className="text-[10px] text-slate-500">{present}/{total} days</div></div>
+        <div className="text-right"><span className="font-display text-xl font-extrabold text-foreground">{pct}%</span><div className="text-[10px] text-slate-500">{present}/{total} days</div></div>
       </div>
       <div className="mt-3 grid grid-cols-7 gap-1.5">
         {hist.slice(-35).map((h) => <div key={h.date} title={`${h.date}: ${h.s}`} className={cx('aspect-square rounded-md', color[h.s])} />)}
@@ -50,9 +50,9 @@ export default function Performance({ studentId = 'ananya' }) {
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-3 gap-2">
-        <Card className="p-3 text-center"><div className="text-[10px] font-semibold text-slate-500">Average</div><div className="font-display text-xl font-extrabold text-navy-800">{avg}%</div><div className="text-[10px] font-semibold text-emerald-600">▲ {avg - prevAvg} pts</div></Card>
-        <Card className="p-3 text-center"><div className="text-[10px] font-semibold text-slate-500">Class rank</div><div className="font-display text-xl font-extrabold text-navy-800">6<span className="text-xs text-slate-400">/34</span></div><div className="text-[10px] font-semibold text-emerald-600">▲ 3 places</div></Card>
-        <Card className="p-3 text-center"><div className="text-[10px] font-semibold text-slate-500">Best subject</div><div className="font-display text-sm font-extrabold leading-7 text-navy-800">Malayalam</div><div className="text-[10px] font-semibold text-slate-500">91%</div></Card>
+        <Card className="p-3 text-center"><div className="text-[10px] font-semibold text-slate-500">Average</div><div className="font-display text-xl font-extrabold text-foreground">{avg}%</div><div className="text-[10px] font-semibold text-emerald-600">▲ {avg - prevAvg} pts</div></Card>
+        <Card className="p-3 text-center"><div className="text-[10px] font-semibold text-slate-500">Class rank</div><div className="font-display text-xl font-extrabold text-foreground">6<span className="text-xs text-slate-400">/34</span></div><div className="text-[10px] font-semibold text-emerald-600">▲ 3 places</div></Card>
+        <Card className="p-3 text-center"><div className="text-[10px] font-semibold text-slate-500">Best subject</div><div className="font-display text-sm font-extrabold leading-7 text-foreground">Malayalam</div><div className="text-[10px] font-semibold text-slate-500">91%</div></Card>
       </div>
 
       <Card className="p-4">
@@ -60,7 +60,7 @@ export default function Performance({ studentId = 'ananya' }) {
         <div className="h-48">
           <ResponsiveContainer>
             <LineChart data={data} margin={{ left: -24, right: 6, top: 6 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#eef2f7" />
+              <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="exam" tick={{ fontSize: 10 }} />
               <YAxis domain={[50, 100]} tick={{ fontSize: 10 }} />
               <Tooltip contentStyle={{ borderRadius: 12, fontSize: 12 }} />
@@ -104,7 +104,7 @@ export default function Performance({ studentId = 'ananya' }) {
           <div className="space-y-3">
             {ASSIGNMENTS.map((a) => (
               <div key={a.name}>
-                <div className="mb-1 flex justify-between text-xs"><span className="font-semibold text-navy-800">{a.name}</span><span className="text-slate-500">{a.submitted}/{a.total}</span></div>
+                <div className="mb-1 flex justify-between text-xs"><span className="font-semibold text-foreground">{a.name}</span><span className="text-slate-500">{a.submitted}/{a.total}</span></div>
                 <Progress value={(a.submitted / a.total) * 100} />
               </div>
             ))}
@@ -115,8 +115,8 @@ export default function Performance({ studentId = 'ananya' }) {
       <Card className="p-4">
         <SectionTitle>Teacher remarks</SectionTitle>
         <div className="space-y-2.5 text-[13px]">
-          <div className="rounded-xl bg-slate-50 p-3"><b className="text-navy-800">Fathima N. (Maths):</b> <span className="text-slate-600">Big improvement since 1st term. Practise word problems daily for 20 minutes.</span></div>
-          <div className="rounded-xl bg-slate-50 p-3"><b className="text-navy-800">Deepa M. (English):</b> <span className="text-slate-600">Creative writer! Her diary entry was read out in class.</span></div>
+          <div className="rounded-xl bg-slate-50 p-3"><b className="text-foreground">Fathima N. (Maths):</b> <span className="text-slate-600">Big improvement since 1st term. Practise word problems daily for 20 minutes.</span></div>
+          <div className="rounded-xl bg-slate-50 p-3"><b className="text-foreground">Deepa M. (English):</b> <span className="text-slate-600">Creative writer! Her diary entry was read out in class.</span></div>
         </div>
       </Card>
     </div>
@@ -128,20 +128,20 @@ function JuniorProgress() {
   return (
     <div className="space-y-4">
       <Card className="bg-gradient-to-br from-sun-300 to-sun-400 p-4 ring-0">
-        <div className="text-sm font-semibold text-navy-800">Term 1 report card · Class 4 uses grades, not marks</div>
+        <div className="text-sm font-semibold text-navy-800/80">Term 1 report card · grades, not marks</div>
         <div className="mt-1 font-display text-3xl font-extrabold text-navy-900">⭐ Overall A</div>
       </Card>
       <div className="grid grid-cols-2 gap-2">
         {grades.map(([s, g, v, e]) => (
           <Card key={s} className="p-3">
             <div className="flex items-center justify-between"><span className="text-2xl">{e}</span><Badge color={g.includes('+') ? 'green' : 'teal'}>{g}</Badge></div>
-            <div className="mt-1 text-sm font-semibold text-navy-800">{s}</div>
+            <div className="mt-1 text-sm font-semibold text-foreground">{s}</div>
             <Progress className="mt-2" value={v} h={6} color="#f6b93b" />
           </Card>
         ))}
       </div>
       <AttendanceHeatmap studentId="aarav" />
-      <Card className="p-4 text-[13px] text-slate-600"><b className="text-navy-800">Class teacher (Smitha K.):</b> Aarav is curious and loves EVS experiments. Encourage reading 10 minutes of English story books every day.</Card>
+      <Card className="p-4 text-[13px] text-slate-600"><b className="text-foreground">Class teacher (Smitha K.):</b> Aarav is curious and loves EVS experiments. Encourage reading 10 minutes of English story books every day.</Card>
     </div>
   )
 }

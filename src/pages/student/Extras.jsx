@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ChevronRight, Heart, MessageCircle, Plus, RotateCcw, Upload } from 'lucide-react'
-import { Avatar, Badge, Button, Card, Field, SectionTitle, Sheet, Tabs, Toggle, inputCls, useToast } from '../../components/ui'
-import { MobileHeader, HeaderActions } from '../../components/MobileShell'
+import { Brain, CalendarCheck, Check, ChevronRight, Compass, Headphones, Heart, Lightbulb, LogOut, MessageCircle, NotebookPen, Plus, RotateCcw, Upload } from 'lucide-react'
+import { Avatar, Badge, Button, Card, Coin, Field, Reveal, SectionTitle, Sheet, Tabs, Toggle, inputCls, useToast } from '../../components/ui'
+import { AccountSheet, MobileHeader, HeaderActions } from '../../components/MobileShell'
 import { useLogout, useSession, useStore } from '../../store/Store'
 import { CAREER_QUIZ, CAREER_RESULTS, FAMILY_PROFILES, STORE_ITEMS, USERS } from '../../data/seed'
 import { LANGS, translate } from '../../i18n'
@@ -32,20 +32,20 @@ export function CoinsStore() {
       <div className="space-y-4 px-4">
         <Card className="overflow-hidden bg-gradient-to-br from-sun-300 via-sun-400 to-sun-500 p-4 ring-0">
           <div className="text-xs font-semibold text-navy-800/70">My balance</div>
-          <div className="font-display text-4xl font-extrabold text-navy-900">🪙 {coins}</div>
+          <div className="tabular flex items-center gap-2 font-display text-4xl font-extrabold text-navy-900"><Coin size={34} /> {coins}</div>
           <div className="mt-1 text-xs text-navy-800/80">Earn coins for attendance, homework, quizzes & good questions</div>
           <div className="mt-3 grid grid-cols-4 gap-2 text-center text-[10px] font-semibold text-navy-900">
-            {[['📅', 'Attendance', '+20/wk'], ['📝', 'Homework', '+10'], ['🧠', 'Quiz', '+30'], ['🎧', 'Audio pod', '+10']].map(([e, l, v]) => <div key={l} className="rounded-xl bg-white/40 py-2"><div className="text-lg">{e}</div>{l}<div className="text-navy-800/70">{v}</div></div>)}
+            {[[CalendarCheck, 'Attendance', '+20/wk'], [NotebookPen, 'Homework', '+10'], [Brain, 'Quiz', '+30'], [Headphones, 'Audio pod', '+10']].map(([E, l, v]) => <div key={l} className="rounded-xl bg-white/40 py-2"><E className="mx-auto mb-1 h-[18px] w-[18px]" />{l}<div className="text-navy-800/70">{v}</div></div>)}
           </div>
         </Card>
-        <Tabs value={tab} onChange={setTab} tabs={[{ value: 'store', label: '🛍️ Store' }, { value: 'history', label: '📜 History' }, { value: 'orders', label: `📦 Orders (${state.orders.filter((o) => o.by === user.name).length})` }]} />
+        <Tabs value={tab} onChange={setTab} tabs={[{ value: 'store', label: 'Store' }, { value: 'history', label: 'History' }, { value: 'orders', label: `Orders (${state.orders.filter((o) => o.by === user.name).length})` }]} />
         {tab === 'store' && (
           <div className="grid grid-cols-2 gap-3">
             {STORE_ITEMS.map((it) => (
               <Card key={it.id} onClick={() => setBuy(it)} className="p-3">
                 <div className="grid h-20 place-items-center rounded-xl bg-slate-50 text-4xl">{it.emoji}</div>
-                <div className="mt-2 line-clamp-2 text-[12.5px] font-semibold leading-snug text-navy-800">{it.name}</div>
-                <div className="mt-1 flex items-center justify-between"><span className="text-xs font-bold text-sun-600">🪙 {it.coins}</span><Badge color="green">{it.discount}</Badge></div>
+                <div className="mt-2 line-clamp-2 text-[12.5px] font-semibold leading-snug text-foreground">{it.name}</div>
+                <div className="mt-1 flex items-center justify-between"><span className="flex items-center gap-1 text-xs font-bold text-sun-600"><Coin size={14} /> {it.coins}</span><Badge color="green">{it.discount}</Badge></div>
                 <div className="text-[10px] text-slate-400 line-through">{inr(it.price)}</div>
               </Card>
             ))}
@@ -55,7 +55,7 @@ export function CoinsStore() {
           <Card className="divide-y divide-slate-100">
             {state.coinHistory[user.id].map((h) => (
               <div key={h.id} className="flex items-center justify-between p-3.5">
-                <div><div className="text-[13px] font-medium text-navy-800">{h.label}</div><div className="text-[11px] text-slate-400">{timeAgo(h.at)}</div></div>
+                <div><div className="text-[13px] font-medium text-foreground">{h.label}</div><div className="text-[11px] text-slate-400">{timeAgo(h.at)}</div></div>
                 <span className={cx('font-bold', h.amt > 0 ? 'text-teal-600' : 'text-coral-500')}>{h.amt > 0 ? '+' : ''}{h.amt}</span>
               </div>
             ))}
@@ -65,22 +65,22 @@ export function CoinsStore() {
           <div className="space-y-2">
             {state.orders.filter((o) => o.by === user.name).length === 0 && <div className="py-8 text-center text-sm text-slate-500">No orders yet. Redeem your coins in the store!</div>}
             {state.orders.filter((o) => o.by === user.name).map((o) => (
-              <Card key={o.id} className="p-3.5"><div className="flex justify-between"><b className="text-sm text-navy-800">{o.item}</b><span className="text-xs text-slate-400">{o.id}</span></div><div className="text-[11px] text-slate-500">🪙 {o.coins} + {inr(o.pay)} · {o.status}</div></Card>
+              <Card key={o.id} className="p-3.5"><div className="flex justify-between"><b className="text-sm text-foreground">{o.item}</b><span className="text-xs text-slate-400">{o.id}</span></div><div className="text-[11px] text-slate-500">{o.coins} + {inr(o.pay)} · {o.status}</div></Card>
             ))}
           </div>
         )}
       </div>
       <Sheet open={!!buy} onClose={() => setBuy(null)} title="Redeem coins"
-        footer={buy && <Button className="w-full" variant="sun" disabled={coins < buy.coins} onClick={() => redeem(buy)}>{coins < buy.coins ? `Need ${buy.coins - coins} more coins` : `Redeem 🪙 ${buy.coins}`}</Button>}>
+        footer={buy && <Button className="w-full" variant="sun" disabled={coins < buy.coins} onClick={() => redeem(buy)}>{coins < buy.coins ? `Need ${buy.coins - coins} more coins` : `Redeem ${buy.coins} coins`}</Button>}>
         {buy && (
           <div className="text-center">
             <div className="mx-auto grid h-28 w-28 place-items-center rounded-3xl bg-slate-50 text-6xl">{buy.emoji}</div>
-            <div className="mt-3 font-display text-lg font-bold text-navy-800">{buy.name}</div>
+            <div className="mt-3 font-display text-lg font-bold text-foreground">{buy.name}</div>
             <div className="text-xs text-slate-500">Supported by {buy.by} · {buy.stock} in stock</div>
             <div className="mt-4 grid grid-cols-3 gap-2 text-xs">
-              <div className="rounded-xl bg-slate-50 p-2"><div className="text-slate-400">MRP</div><b className="text-navy-800">{inr(buy.price)}</b></div>
+              <div className="rounded-xl bg-slate-50 p-2"><div className="text-slate-400">MRP</div><b className="text-foreground">{inr(buy.price)}</b></div>
               <div className="rounded-xl bg-emerald-50 p-2"><div className="text-emerald-600">Coins give</div><b className="text-emerald-700">{buy.discount}</b></div>
-              <div className="rounded-xl bg-sun-50 p-2"><div className="text-sun-700">You pay</div><b className="text-navy-800">{buy.discount === 'FREE' ? '₹0' : inr(buy.price - parseInt(buy.discount.replace(/\D/g, ''), 10))}</b></div>
+              <div className="rounded-xl bg-sun-50 p-2"><div className="text-sun-700">You pay</div><b className="text-foreground">{buy.discount === 'FREE' ? '₹0' : inr(buy.price - parseInt(buy.discount.replace(/\D/g, ''), 10))}</b></div>
             </div>
             <p className="mt-3 text-[11px] text-slate-400">Pickup at the school office, or doorstep delivery with the next CSR kit run.</p>
           </div>
@@ -123,7 +123,7 @@ export function TalentWall() {
   }
   return (
     <div>
-      <MobileHeader back="/student" title={translate('talentWall', state.lang)} sub="Art, poems & stories by students" right={<button onClick={() => setPost(true)} className="grid h-9 w-9 place-items-center rounded-full bg-navy-800 text-white" aria-label="New post"><Plus className="h-4 w-4" /></button>}>
+      <MobileHeader back="/student" title={translate('talentWall', state.lang)} sub="Art, poems & stories by students" right={<button onClick={() => setPost(true)} className="grid h-9 w-9 place-items-center rounded-full bg-primary text-white" aria-label="New post"><Plus className="h-4 w-4" /></button>}>
         <Tabs className="mt-3" value={filter} onChange={setFilter} tabs={['All', 'Art', 'Poem', 'Story']} />
       </MobileHeader>
       <div className="columns-2 gap-3 px-4 [&>*]:mb-3">
@@ -132,7 +132,7 @@ export function TalentWall() {
             {t.type === 'Art' ? <div className="aspect-[4/3]"><Art hue={t.hue} title={t.title} /></div>
               : <div className={cx('p-3 text-[12.5px] leading-relaxed', t.type === 'Poem' ? 'bg-violet-50 text-violet-900' : 'bg-sky-50 text-sky-900')}><div className="mb-1 font-bold">{t.title}</div><div className="whitespace-pre-line">{t.text}</div></div>}
             <div className="p-2.5">
-              {t.type === 'Art' && <div className="text-[12px] font-semibold leading-snug text-navy-800">{t.title}</div>}
+              {t.type === 'Art' && <div className="text-[12px] font-semibold leading-snug text-foreground">{t.title}</div>}
               <div className="mt-0.5 text-[10.5px] text-slate-500">{t.by} · {t.cls} {t.pending && <Badge color="sun">Awaiting approval</Badge>}</div>
               <div className="mt-1.5 flex items-center gap-3 text-[11px] text-slate-500">
                 <button onClick={() => like(t.id)} className={cx('flex items-center gap-1', state.liked[user.id + t.id] && 'text-coral-500')}><Heart className={cx('h-3.5 w-3.5', state.liked[user.id + t.id] && 'fill-coral-500')} />{t.likes}</button>
@@ -148,7 +148,7 @@ export function TalentWall() {
         {form.type === 'Art' ? (
           <button className="mb-3 flex w-full flex-col items-center gap-1 rounded-2xl border-2 border-dashed border-slate-300 p-6 text-sm text-slate-500"><Upload className="h-6 w-6" /> Take a photo of your drawing</button>
         ) : <Field label="Your writing"><textarea className={cx(inputCls, 'h-32 resize-none')} value={form.text} onChange={(e) => setForm({ ...form, text: e.target.value })} placeholder="Write in any language…" /></Field>}
-        <p className="text-[11px] text-slate-400">🛡️ Only first name + class is shown. Teachers approve every post. No comments from outside the school.</p>
+        <p className="text-[11px] text-muted-foreground">Only your first name and class are shown. Teachers approve every post.</p>
       </Sheet>
     </div>
   )
@@ -180,15 +180,15 @@ export function CareerPath() {
         {i === -1 && (
           <Card className="overflow-hidden">
             <div className="bg-gradient-to-br from-sky-500 to-navy-800 p-6 text-center text-white">
-              <div className="text-5xl">🧭</div>
+              <div className="mx-auto grid h-16 w-16 place-items-center rounded-3xl bg-white/15"><Compass className="h-8 w-8" /></div>
               <div className="mt-2 font-display text-xl font-extrabold">Discover your path</div>
               <p className="mt-1 text-xs text-white/80">5 fun questions · 2 minutes · no wrong answers</p>
             </div>
             <div className="p-4">
               <ul className="space-y-2 text-[13px] text-slate-600">
-                <li>✅ Builds a long-term roadmap from your interests</li>
-                <li>✅ Suggests Plus One streams & Kerala colleges</li>
-                <li>✅ Links scholarships & entrance exams</li>
+                <li className="flex gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-teal-600" />Builds a long-term roadmap from your interests</li>
+                <li className="flex gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-teal-600" />Suggests Plus One streams and Kerala colleges</li>
+                <li className="flex gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-teal-600" />Links scholarships and entrance exams</li>
               </ul>
               <Button className="mt-4 w-full" variant="primary" onClick={() => setI(0)}>Start the quiz</Button>
             </div>
@@ -198,10 +198,10 @@ export function CareerPath() {
           <div>
             <div className="mb-3 flex gap-1.5">{CAREER_QUIZ.map((_, k) => <div key={k} className={cx('h-1.5 flex-1 rounded-full', k <= i ? 'bg-teal-500' : 'bg-slate-200')} />)}</div>
             <div className="text-xs font-semibold text-slate-400">Question {i + 1} of {CAREER_QUIZ.length}</div>
-            <div className="mt-1 font-display text-xl font-extrabold text-navy-800">{CAREER_QUIZ[i].q}</div>
+            <div className="mt-1 font-display text-xl font-extrabold text-foreground">{CAREER_QUIZ[i].q}</div>
             <div className="mt-4 space-y-2.5">
               {CAREER_QUIZ[i].opts.map(([label, k]) => (
-                <button key={label} onClick={() => pick(k)} className="w-full rounded-2xl bg-white p-4 text-left text-[14px] font-semibold text-navy-800 shadow-card ring-1 ring-slate-900/5 transition hover:ring-2 hover:ring-teal-500 active:scale-[.99]">{label}</button>
+                <button key={label} onClick={() => pick(k)} className="w-full rounded-2xl bg-card p-4 text-left text-[14px] font-semibold text-foreground shadow-card ring-1 ring-slate-900/5 transition hover:ring-2 hover:ring-teal-500 active:scale-[.99]">{label}</button>
               ))}
             </div>
           </div>
@@ -210,7 +210,7 @@ export function CareerPath() {
           <div className="space-y-3">
             <Card className="p-5 text-center" style={{ background: res.color + '18' }}>
               <div className="text-xs font-semibold text-slate-500">You are…</div>
-              <div className="font-display text-2xl font-extrabold text-navy-800">{res.title}</div>
+              <div className="font-display text-2xl font-extrabold text-foreground">{res.title}</div>
               <div className="mt-2 flex justify-center gap-1.5">{top.map(([k, v]) => <Badge key={k} color="slate">{CAREER_RESULTS[k].title.split(' ')[1]} {Math.round((v / ans.length) * 100)}%</Badge>)}</div>
             </Card>
             <Card className="p-4">
@@ -221,7 +221,7 @@ export function CareerPath() {
                 <li className="flex gap-2"><span className="font-bold text-teal-600">After 12</span><span className="text-slate-600">{res.paths.join(' · ')}</span></li>
               </ol>
             </Card>
-            <Card className="p-4 text-[13px] text-slate-600">💡 Premium AI career report (₹50–100) adds aptitude tests and a mentor call. <b>Free for CSR-sponsored students.</b></Card>
+            <Card className="flex gap-3 p-4 text-[13px] text-slate-600"><Lightbulb className="h-5 w-5 shrink-0 text-sun-500" /><span>Premium AI career report (₹50–100) adds aptitude tests and a mentor call. <b>Free for sponsored students.</b></span></Card>
             <Button variant="outline" className="w-full" icon={RotateCcw} onClick={() => { setAns([]); setI(-1) }}>Retake quiz</Button>
           </div>
         )}
@@ -230,59 +230,40 @@ export function CareerPath() {
   )
 }
 
-// ---------- More / settings (shared by student & parent) ----------
-export function MoreMenu({ items, base }) {
-  const { state, mutate } = useStore()
+// ---------- More ----------
+export function MoreMenu({ items }) {
+  const { state } = useStore()
   const { user } = useSession()
   const nav = useNavigate()
   const logout = useLogout()
-  const family = FAMILY_PROFILES.map((id) => USERS[id]).filter((u) => u.id !== user.id)
+  const [account, setAccount] = useState(false)
   return (
     <div>
       <MobileHeader title={translate('more', state.lang)} right={<HeaderActions userId={user.id} />} />
       <div className="space-y-4 px-4">
-        <Card className="flex items-center gap-3 p-4">
-          <Avatar emoji={user.avatar} color={user.color} size={52} />
-          <div className="min-w-0 flex-1">
-            <div className="font-display text-lg font-extrabold text-navy-800">{user.name}</div>
-            <div className="text-xs text-slate-500">{user.role === 'student' ? `Class ${user.className} · Vidyanagar GHSS` : user.role === 'parent' ? `${user.relation} of Ananya & Aarav` : 'Route 3 driver'}</div>
-          </div>
-        </Card>
         {items && (
-          <div className="grid grid-cols-3 gap-2">
-            {items.map((it) => (
-              <Card key={it.to} onClick={() => nav(it.to)} className="flex flex-col items-center gap-1 p-3 text-center">
-                <span className="text-2xl">{it.emoji}</span><span className="text-[11px] font-semibold leading-tight text-navy-800">{it.label}</span>
-              </Card>
+          <div className="grid grid-cols-3 gap-2.5">
+            {items.map((it, i) => (
+              <Reveal key={it.to} delay={i * 30}>
+                <Card onClick={() => nav(it.to)} className="flex h-full flex-col items-center gap-2 px-2 py-4 text-center">
+                  <span className={cx('grid h-11 w-11 place-items-center rounded-2xl', it.tint)}><it.icon className="h-5 w-5" /></span><span className="text-[11.5px] font-semibold leading-tight text-foreground">{it.label}</span>
+                </Card>
+              </Reveal>
             ))}
           </div>
         )}
-        {user.role !== 'driver' && (
-          <Card className="p-4">
-            <SectionTitle>{translate('switchProfile', state.lang)} · family phone</SectionTitle>
-            <div className="flex gap-3">
-              {family.map((f) => (
-                <button key={f.id} onClick={() => nav('/family?pick=' + f.id)} className="flex flex-col items-center gap-1">
-                  <Avatar emoji={f.avatar} color={f.color} size={48} /><span className="text-[11px] font-semibold text-navy-800">{f.short}</span>
-                </button>
-              ))}
-            </div>
-          </Card>
-        )}
-        <Card className="p-4">
-          <SectionTitle>Settings</SectionTitle>
-          <div className="mb-2 text-xs font-semibold text-slate-500">{translate('language', state.lang)} (screens & voice prompts)</div>
-          <div className="grid grid-cols-3 gap-2">
-            {LANGS.map((l) => <button key={l.code} onClick={() => mutate((d) => { d.lang = l.code })} className={cx('rounded-xl py-2.5 text-sm font-bold ring-1', state.lang === l.code ? 'bg-teal-50 text-teal-700 ring-teal-500' : 'bg-white text-navy-800 ring-slate-200')}>{l.native}</button>)}
-          </div>
-          <div className="mt-2 divide-y divide-slate-100">
-            <Toggle checked={state.dataSaver} onChange={(v) => mutate((d) => { d.dataSaver = v })} label={translate('dataSaver', state.lang)} sub="Text-first, compressed audio, images on tap" />
-            <Toggle checked={state.consent.voice} onChange={(v) => mutate((d) => { d.consent.voice = v })} label="Voice prompts" sub="Read screens aloud for low-literacy users" />
-          </div>
+        <Card className="divide-y divide-border overflow-hidden">
+          <button onClick={() => setAccount(true)} className="flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors hover:bg-muted">
+            <Avatar name={user.name} color={user.color} size={40} />
+            <span className="min-w-0 flex-1"><span className="block truncate text-sm font-semibold text-foreground">{user.name}</span><span className="text-xs text-muted-foreground">Account, appearance and language</span></span>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          </button>
+          <button onClick={logout} className="flex w-full items-center gap-3 px-4 py-3.5 text-left text-sm font-semibold text-coral-600 transition-colors hover:bg-coral-50">
+            <LogOut className="h-[18px] w-[18px]" /><span className="flex-1">{translate('logout', state.lang)}</span>
+          </button>
         </Card>
-        <button onClick={logout} className="flex w-full items-center justify-between rounded-2xl bg-white p-4 text-sm font-semibold text-coral-600 shadow-card ring-1 ring-slate-900/5">{translate('logout', state.lang)} <ChevronRight className="h-4 w-4" /></button>
-        <p className="pb-2 text-center text-[10px] text-slate-400">Vidya Sethu prototype v0.1 · demo data only · DPDP Act 2023 aligned design</p>
       </div>
+      <AccountSheet open={account} onClose={() => setAccount(false)} />
     </div>
   )
 }

@@ -1,119 +1,218 @@
-import { useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
-import { Link, useNavigate } from 'react-router-dom'
-import { ArrowRight, Eye, EyeOff, KeyRound, Smartphone, UserRound } from 'lucide-react'
-import { Badge, Logo, inputCls, useToast } from '../components/ui'
+import { useNavigate, useSearchParams } from 'react-router-dom'
+import gsap from 'gsap'
+import { ArrowLeft, ArrowRight, Delete, Eye, EyeOff, Fingerprint, Info, KeyRound, Lock, ShieldCheck, Smartphone, UserRound } from 'lucide-react'
+import { Avatar, Logo, Segmented, useToast } from '../components/ui'
+import { AppFrame, LanguageButton } from '../components/MobileShell'
 import { persistSession, useStore } from '../store/Store'
-import { DEMO_PASSWORD, LOGINS, USERS } from '../data/seed'
-import { LANGS } from '../i18n'
+import { DEMO_PASSWORD, FAMILY_PROFILES, LOGINS, USERS } from '../data/seed'
+import { translate } from '../i18n'
+import { speak } from '../lib/speech'
 import { cx } from '../lib/utils'
 
-const ROLE_ICON = { student: '🎒', parent: '👨‍👩‍👧', teacher: '👩🏽‍🏫', school: '🏫', driver: '🚌', ngo: '🤝', counselor: '💚', admin: '🛰️' }
+const ROLE_LABEL = { student: 'Student', parent: 'Parent', teacher: 'Teacher', school: 'Principal', driver: 'Bus driver', ngo: 'NGO partner', counselor: 'Counsellor', admin: 'District admin' }
+const PEOPLE = LOGINS.map((l) => ({ ...l, user: USERS[l.username] }))
 
-export default function Login() {
-  const { state, mutate } = useStore()
+function useSignIn() {
+  const { mutate } = useStore()
   const nav = useNavigate()
   const toast = useToast()
-  const [sel, setSel] = useState(LOGINS[0])
-  const [username, setUsername] = useState(LOGINS[0].username)
+  return (username, via) => {
+    const l = LOGINS.find((x) => x.username === username)
+    const session = { userId: l.username, role: l.role, via }
+    persistSession(session)
+    flushSync(() => mutate((d) => { d.session = session; if (l.role === 'parent') d.activeChild = 'ananya' }))
+    toast(`Welcome, ${USERS[l.username].short}`)
+    nav(l.home)
+  }
+}
+
+function AccountForm() {
+  const signIn = useSignIn()
+  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [show, setShow] = useState(false)
+  const [focus, setFocus] = useState(false)
   const [err, setErr] = useState('')
+  const toast = useToast()
+  const pwRef = useRef(null)
 
-  const pick = (l) => { setSel(l); setUsername(l.username); setPassword(''); setErr('') }
+  const q = username.trim().toLowerCase()
+  const matches = useMemo(() => PEOPLE.filter((p) => !q || p.username.includes(q) || p.user.name.toLowerCase().includes(q) || ROLE_LABEL[p.role].toLowerCase().includes(q)), [q])
+  const exact = PEOPLE.find((p) => p.username === q || p.user.name.toLowerCase() === q)
+
+  const choose = (p) => { setUsername(p.username); setFocus(false); setErr(''); setTimeout(() => pwRef.current && pwRef.current.focus(), 0) }
   const submit = (e) => {
     e.preventDefault()
-    const match = LOGINS.find((l) => l.username === username.trim().toLowerCase())
-    if (!match) return setErr('Unknown username. Pick a demo role above.')
-    if (password !== DEMO_PASSWORD) return setErr('Wrong password. Demo password is 123456')
-    const session = { userId: match.username, role: match.role, via: 'password' }
-    persistSession(session)
-    flushSync(() => mutate((d) => { d.session = session }))
-    toast(`Welcome, ${USERS[match.username].name}`, ROLE_ICON[match.role])
-    nav(match.home)
+    if (!exact) return setErr('We couldn’t find that account. Choose a name from the list.')
+    if (password !== DEMO_PASSWORD) return setErr('Incorrect password. Please try again.')
+    signIn(exact.username, 'password')
   }
 
   return (
-    <div className="grid min-h-screen lg:grid-cols-[1.05fr_1fr]">
-      <div className="relative hidden overflow-hidden bg-navy-800 p-12 text-white lg:flex lg:flex-col">
-        <div className="absolute -right-24 -top-24 h-96 w-96 rounded-full bg-teal-500/30" />
-        <div className="absolute bottom-24 right-24 h-40 w-40 rounded-full bg-sun-400/30" />
-        <div className="absolute -bottom-16 left-24 h-64 w-64 rounded-full bg-sky-500/25" />
-        <div className="absolute left-1/2 top-1/2 h-20 w-20 rounded-full bg-coral-400/40" />
-        <Link to="/" className="relative"><Logo size={44} light sub="Socio-educational support bridge" /></Link>
-        <div className="relative mt-auto max-w-lg">
-          <Badge color="sun" className="!bg-sun-400 !text-navy-900">Clickable prototype · demo data</Badge>
-          <h1 className="mt-4 font-display text-5xl font-extrabold leading-[1.05] tracking-tight">One bridge between students, families, schools & community.</h1>
-          <p className="mt-4 text-lg text-white/75">Verified notices, live bus safety, voice-first learning in Malayalam, and CSR support, built for families sharing one smartphone.</p>
-          <div className="mt-8 grid grid-cols-3 gap-3 text-sm">
-            {[['🚌', 'Live bus radar'], ['🎧', 'Audio pods'], ['📢', 'Verified notices']].map(([e, t]) => <div key={t} className="rounded-2xl bg-white/10 p-4 ring-1 ring-white/10"><div className="text-2xl">{e}</div><div className="mt-1 font-semibold">{t}</div></div>)}
-          </div>
+    <form onSubmit={submit} className="space-y-3.5" autoComplete="off">
+      <div className="relative z-20" data-anim style={{ animationDelay: "0.35s" }}>
+        <label htmlFor="username" className="mb-1.5 block text-xs font-semibold text-muted-foreground">Username</label>
+        <div className={cx('flex items-center gap-3 rounded-2xl bg-muted px-4 ring-1 transition-all duration-300', focus ? 'bg-card ring-2 ring-teal-500' : 'ring-transparent')}>
+          {exact ? <Avatar name={exact.user.name} color={exact.user.color} size={26} /> : <UserRound className="h-[18px] w-[18px] shrink-0 text-muted-foreground" />}
+          <input id="username" value={username} onChange={(e) => { setUsername(e.target.value); setErr(''); setFocus(true) }} onFocus={() => setFocus(true)} onBlur={() => setTimeout(() => setFocus(false), 150)}
+            placeholder="Enter your username" autoCapitalize="none" autoCorrect="off" spellCheck="false" className="h-[52px] min-w-0 flex-1 bg-transparent text-[15px] text-foreground outline-none placeholder:text-slate-400" />
+          {exact && <span className="shrink-0 rounded-full bg-teal-50 px-2 py-0.5 text-[11px] font-semibold text-teal-700">{ROLE_LABEL[exact.role]}</span>}
         </div>
-        <div className="relative mt-10 text-xs text-white/50">Pilot concept · Malappuram district, Kerala</div>
-      </div>
-
-      <div className="flex items-center justify-center bg-slate-50 p-5 sm:p-10">
-        <div className="w-full max-w-lg">
-          <div className="mb-6 flex items-center justify-between lg:hidden"><Link to="/"><Logo size={38} /></Link></div>
-          <h2 className="font-display text-3xl font-extrabold text-navy-800">Sign in</h2>
-          <p className="mt-1 text-sm text-slate-500">Choose a role to explore. <b className="text-navy-800">Every demo account uses password 123456.</b></p>
-
-          <Link to="/family" className="mt-5 flex items-center gap-4 rounded-2xl bg-gradient-to-r from-teal-500 to-teal-600 p-4 text-white shadow-float transition hover:brightness-105">
-            <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-white/15"><Smartphone className="h-6 w-6" /></div>
-            <div className="flex-1">
-              <div className="font-bold">Family Device mode</div>
-              <div className="text-xs text-white/80">One shared phone, separate PIN-protected profiles for parents & children (PIN 123456)</div>
-            </div>
-            <ArrowRight className="h-5 w-5" />
-          </Link>
-
-          <div className="my-5 flex items-center gap-3 text-[11px] font-semibold uppercase tracking-wider text-slate-400"><span className="h-px flex-1 bg-slate-200" />or sign in with a role<span className="h-px flex-1 bg-slate-200" /></div>
-
-          <div className="grid grid-cols-3 gap-2">
-            {LOGINS.map((l) => (
-              <button key={l.username} type="button" onClick={() => pick(l)} className={cx('rounded-2xl p-3 text-left transition', sel.username === l.username ? 'bg-navy-800 text-white shadow-float' : 'bg-white text-navy-800 shadow-card ring-1 ring-slate-900/5 hover:ring-teal-400')}>
-                <div className="text-xl">{ROLE_ICON[l.role]}</div>
-                <div className="mt-1 text-[12.5px] font-bold leading-tight">{l.label}</div>
-                <div className={cx('mt-0.5 truncate text-[10.5px]', sel.username === l.username ? 'text-white/70' : 'text-slate-500')}>{l.hint}</div>
+        {focus && matches.length > 0 && !exact && (
+          <div className="absolute inset-x-0 top-full z-30 mt-2 max-h-72 animate-slideUp overflow-y-auto rounded-[20px] bg-card p-1.5 shadow-float ring-1 ring-border">
+            <div className="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Suggested accounts</div>
+            {matches.map((p) => (
+              <button key={p.username} type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => choose(p)} className="flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-left transition-colors hover:bg-muted">
+                <Avatar name={p.user.name} color={p.user.color} size={36} />
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-sm font-semibold text-foreground">{p.user.name}</span>
+                  <span className="block truncate text-xs text-muted-foreground">{ROLE_LABEL[p.role]}{p.user.className ? ` · Class ${p.user.className}` : ''} · @{p.username}</span>
+                </span>
               </button>
             ))}
           </div>
+        )}
+      </div>
 
-          <form onSubmit={submit} className="mt-5 rounded-2xl bg-white p-5 shadow-card ring-1 ring-slate-900/5">
-            <label className="block text-xs font-semibold text-slate-600">Username</label>
-            <div className="relative mt-1">
-              <UserRound className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-              <input className={cx(inputCls, 'pl-9')} value={username} onChange={(e) => setUsername(e.target.value)} autoCapitalize="none" />
-            </div>
-            <label className="mt-3 block text-xs font-semibold text-slate-600">Password</label>
-            <div className="relative mt-1">
-              <KeyRound className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-              <input className={cx(inputCls, 'pl-9 pr-10')} type={show ? 'text' : 'password'} value={password} onChange={(e) => { setPassword(e.target.value); setErr('') }} placeholder="123456" inputMode="numeric" />
-              <button type="button" onClick={() => setShow(!show)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" aria-label="Show password">{show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}</button>
-            </div>
-            {err && <div className="mt-2 text-xs font-semibold text-coral-600">{err}</div>}
-            <div className="mt-4 flex gap-2">
-              <button type="button" onClick={() => setPassword(DEMO_PASSWORD)} className="rounded-xl bg-slate-100 px-3 text-xs font-semibold text-navy-800 hover:bg-slate-200">Fill demo password</button>
-              <button type="submit" className="flex h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-navy-800 text-sm font-bold text-white hover:bg-navy-700">Sign in as {sel.label} <ArrowRight className="h-4 w-4" /></button>
-            </div>
-            <div className="mt-3 text-[11px] text-slate-400">Real app: teachers create student accounts with temporary passwords, and users set their own password on first login.</div>
-          </form>
-
-          <div className="mt-4 flex items-center justify-between">
-            <div className="flex gap-1.5">
-              {LANGS.map((l) => <button key={l.code} onClick={() => mutate((d) => { d.lang = l.code })} className={cx('rounded-full px-3 py-1 text-xs font-semibold', state.lang === l.code ? 'bg-teal-500 text-white' : 'bg-white text-slate-600 ring-1 ring-slate-200')}>{l.native}</button>)}
-            </div>
-            <Link to="/" className="text-xs font-semibold text-teal-600 hover:underline">← About Vidya Sethu</Link>
-          </div>
-
-          <details className="mt-4 rounded-2xl bg-white p-4 text-xs text-slate-600 ring-1 ring-slate-200">
-            <summary className="cursor-pointer font-semibold text-navy-800">All demo logins</summary>
-            <table className="mt-2 w-full">
-              <tbody>{LOGINS.map((l) => <tr key={l.username} className="border-t border-slate-100"><td className="py-1.5 font-semibold">{l.label}</td><td className="font-mono">{l.username}</td><td className="font-mono">123456</td></tr>)}</tbody>
-            </table>
-          </details>
+      <div data-anim style={{ animationDelay: "0.40s" }}>
+        <div className="mb-1.5 flex items-center justify-between">
+          <label htmlFor="password" className="text-xs font-semibold text-muted-foreground">Password</label>
+          <button type="button" onClick={() => toast('Ask your school office to reset your password')} className="text-xs font-semibold text-teal-600 hover:text-teal-700">Forgot password?</button>
+        </div>
+        <div className="flex items-center gap-3 rounded-2xl bg-muted px-4 ring-1 ring-transparent transition-all duration-300 focus-within:bg-card focus-within:ring-2 focus-within:ring-teal-500">
+          <KeyRound className="h-[18px] w-[18px] shrink-0 text-muted-foreground" />
+          <input id="password" ref={pwRef} type={show ? 'text' : 'password'} inputMode="numeric" value={password} onChange={(e) => { setPassword(e.target.value); setErr('') }} placeholder="Enter your password" className="h-[52px] min-w-0 flex-1 bg-transparent text-[15px] text-foreground outline-none placeholder:text-slate-400" />
+          <button type="button" onClick={() => setShow(!show)} className="text-muted-foreground transition-colors hover:text-foreground" aria-label={show ? 'Hide password' : 'Show password'}>{show ? <EyeOff className="h-[18px] w-[18px]" /> : <Eye className="h-[18px] w-[18px]" />}</button>
         </div>
       </div>
+
+      {err && <div className="animate-fadeIn rounded-2xl bg-coral-50 px-4 py-2.5 text-[13px] font-medium text-coral-600" role="alert">{err}</div>}
+
+      <div data-anim style={{ animationDelay: "0.45s" }} className="flex items-start gap-2.5 rounded-2xl bg-sky-50 px-4 py-3 text-[12.5px] text-sky-700">
+        <Info className="mt-px h-4 w-4 shrink-0" />
+        <span>Demo access: every account uses the password <b className="tabular font-bold">1234</b>.</span>
+      </div>
+
+      <button data-anim style={{ animationDelay: "0.50s" }} type="submit" className="flex h-[54px] w-full items-center justify-center gap-2 rounded-2xl bg-primary text-[15px] font-bold text-primary-foreground shadow-soft transition-all duration-300 hover:bg-primary/90 active:scale-[.98]">
+        Sign in <ArrowRight className="h-[18px] w-[18px]" />
+      </button>
+    </form>
+  )
+}
+
+function FamilyDevice({ initial }) {
+  const { state } = useStore()
+  const signIn = useSignIn()
+  const [who, setWho] = useState(initial || null)
+  const [pin, setPin] = useState('')
+  const [shake, setShake] = useState(false)
+  const lang = state.lang
+  const u = who && USERS[who]
+
+  const check = (full) => {
+    if (full === DEMO_PASSWORD) return signIn(u.id, 'pin')
+    setShake(true); setTimeout(() => { setShake(false); setPin('') }, 450)
+  }
+  const press = (k) => {
+    if (k === 'del') return setPin(pin.slice(0, -1))
+    if (pin.length >= 4) return
+    const next = pin + k
+    setPin(next)
+    if (next.length === 4) setTimeout(() => check(next), 120)
+  }
+
+  if (!u) {
+    return (
+      <div>
+        <p className="text-center text-sm text-muted-foreground">{translate('whoIsUsing', lang)}</p>
+        <div className="mt-4 grid grid-cols-2 gap-3">
+          {FAMILY_PROFILES.map((id) => {
+            const p = USERS[id]
+            return (
+              <button key={id} onClick={() => { setWho(id); speak(`${p.short}. ${translate('enterPin', lang)}`, lang) }} className="flex flex-col items-center rounded-[22px] bg-muted px-3 py-4 transition-all duration-300 hover:bg-slate-200 active:scale-[.97]">
+                <div className="relative">
+                  <Avatar name={p.name} color={p.color} size={60} />
+                  <span className="absolute -bottom-0.5 -right-0.5 grid h-6 w-6 place-items-center rounded-full bg-card shadow-soft"><Lock className="h-3 w-3 text-muted-foreground" /></span>
+                </div>
+                <div className="mt-2.5 text-sm font-bold text-foreground">{p.short}</div>
+                <div className="text-[11px] text-muted-foreground">{p.role === 'parent' ? p.relation : `Class ${p.className}`}</div>
+              </button>
+            )
+          })}
+        </div>
+        <div className="mt-4 flex items-start gap-2.5 rounded-2xl bg-sky-50 px-4 py-3 text-[12.5px] text-sky-700">
+          <Info className="mt-px h-4 w-4 shrink-0" /><span>One shared phone, a private profile for each family member. Demo PIN: <b className="tabular font-bold">1234</b>.</span>
+        </div>
+      </div>
+    )
+  }
+  return (
+    <div className="flex flex-col items-center">
+      <button onClick={() => { setWho(null); setPin('') }} className="flex items-center gap-1 self-start text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground"><ArrowLeft className="h-3.5 w-3.5" /> All profiles</button>
+      <Avatar name={u.name} color={u.color} size={64} />
+      <div className="mt-2 font-display text-lg font-bold text-foreground">{u.short}</div>
+      <div className="text-[13px] text-muted-foreground">{translate('enterPin', lang)}</div>
+      <div className="mt-4 flex gap-4" style={shake ? { animation: 'shake .4s' } : undefined}>
+        {[0, 1, 2, 3].map((i) => <span key={i} className={cx('h-3.5 w-3.5 rounded-full transition-all duration-200', i < pin.length ? (shake ? 'scale-110 bg-coral-500' : 'scale-110 bg-foreground') : 'bg-slate-200')} />)}
+      </div>
+      <div className="mt-5 grid w-full max-w-[264px] grid-cols-3 gap-2.5">
+        {['1', '2', '3', '4', '5', '6', '7', '8', '9', 'bio', '0', 'del'].map((k) => (
+          <button key={k} type="button" onClick={() => (k === 'bio' ? check(DEMO_PASSWORD) : press(k))} aria-label={k === 'bio' ? 'Use fingerprint' : k === 'del' ? 'Delete' : k}
+            className={cx('grid h-[58px] place-items-center rounded-2xl font-display text-[22px] font-semibold text-foreground transition-all duration-200 active:scale-95', k === 'bio' || k === 'del' ? 'hover:bg-muted' : 'bg-muted hover:bg-slate-200')}>
+            {k === 'del' ? <Delete className="h-5 w-5" /> : k === 'bio' ? <Fingerprint className="h-6 w-6 text-teal-600" /> : k}
+          </button>
+        ))}
+      </div>
     </div>
+  )
+}
+
+export default function Login({ mode }) {
+  const [params] = useSearchParams()
+  const [tab, setTab] = useState(mode === 'family' || params.get('pick') ? 'family' : 'account')
+  const root = useRef(null)
+
+  // GSAP entrance: hero mark, then the sign-in card, then its fields
+  useLayoutEffect(() => {
+    const mm = gsap.matchMedia()
+    const ctx = gsap.context(() => {
+      mm.add('(prefers-reduced-motion: no-preference)', () => {
+        gsap.timeline({ defaults: { ease: 'power3.out' } })
+          .from('[data-hero] > *', { y: 16, autoAlpha: 0, duration: 0.5, stagger: 0.06, clearProps: 'all' })
+          .from('[data-card]', { y: 48, autoAlpha: 0, duration: 0.5, clearProps: 'all' }, '-=0.35')
+      })
+    }, root)
+    return () => { ctx.revert(); mm.revert() }
+  }, [])
+  useEffect(() => { if (params.get('pick')) setTab('family') }, [params])
+
+  return (
+    <AppFrame>
+      <div ref={root} className="no-scrollbar relative flex h-full flex-col overflow-y-auto bg-background">
+        <div className="relative shrink-0 overflow-hidden bg-[linear-gradient(160deg,#1d3a63,#0e1a2e_70%)] px-6 pb-16 text-white" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 14px)' }}>
+          <div className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full bg-teal-500/30 blur-3xl" />
+          <div className="pointer-events-none absolute -left-16 top-24 h-48 w-48 rounded-full bg-sun-400/20 blur-3xl" />
+          <div className="relative flex justify-end"><LanguageButton /></div>
+          <div data-hero className="relative mt-6 flex flex-col items-center text-center">
+            <div className="rounded-[26px] bg-white/10 p-2.5 ring-1 ring-white/15 backdrop-blur"><Logo size={60} withText={false} /></div>
+            <h1 className="mt-4 font-display text-[30px] font-extrabold tracking-tight">Vidya Sethu</h1>
+            <p className="mt-0.5 text-[15px] font-medium text-sun-300">വിദ്യാ സേതു</p>
+            <p className="mt-1.5 text-[13.5px] text-white/70">School, family and community, connected.</p>
+          </div>
+        </div>
+
+        <div data-card className="edge-gradient edge-gradient-soft relative -mt-9 flex-1 rounded-t-[32px] bg-card px-5 pt-6 shadow-float" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 20px)' }}>
+          <div data-anim style={{ animationDelay: "0.22s" }}>
+            <h2 className="font-display text-[22px] font-extrabold tracking-tight text-foreground">{tab === 'account' ? 'Welcome back' : 'Family phone'}</h2>
+            <p className="mt-0.5 text-[13px] text-muted-foreground">{tab === 'account' ? 'Sign in with the account your school gave you.' : 'Pick your profile and enter your PIN.'}</p>
+          </div>
+          <div data-anim style={{ animationDelay: "0.28s" }}><Segmented className="mb-5 mt-4" value={tab} onChange={setTab} options={[{ value: 'account', label: 'Account', icon: UserRound }, { value: 'family', label: 'Family phone', icon: Smartphone }]} /></div>
+          {tab === 'account' ? <AccountForm /> : <FamilyDevice initial={params.get('pick')} />}
+          <div className="mt-6 flex items-center justify-center gap-1.5 text-[11px] text-muted-foreground"><ShieldCheck className="h-3.5 w-3.5" /> Secure sign-in · Data protected under the DPDP Act</div>
+        </div>
+      </div>
+    </AppFrame>
   )
 }

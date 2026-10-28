@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import * as S from '../data/seed'
 import { hoursAgo, todayKey, uid } from '../lib/utils'
 
-const KEY = 'vidya-sethu-proto-v3'
+const KEY = 'vidya-sethu-v4'
 export const TRIP_MS = 6 * 60 * 1000 // demo: a 45-minute route plays in 6 minutes
 
 function seedAttendance() {
@@ -16,6 +16,7 @@ function seedAttendance() {
 export function makeSeed() {
   return {
     lang: 'en',
+    theme: 'system',
     dataSaver: true,
     session: null,
     activeChild: 'ananya',
@@ -109,11 +110,24 @@ export function StoreProvider({ children }) {
     } catch { /* ignore */ }
   }, [state])
 
+  // apply light / dark theme (system follows the phone setting)
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-color-scheme: dark)')
+    const apply = () => {
+      const dark = state.theme === 'dark' || (state.theme === 'system' && mq.matches)
+      document.documentElement.classList.toggle('dark', dark)
+      document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dark ? '#0b1220' : '#f5f7fa')
+    }
+    apply()
+    mq.addEventListener('change', apply)
+    return () => mq.removeEventListener('change', apply)
+  }, [state.theme])
+
   // sync between tabs (e.g. Parent in one tab, Driver in another)
   useEffect(() => {
     const onStorage = (e) => {
       if (e.key === KEY && e.newValue) {
-        try { const s = JSON.parse(e.newValue); dispatch({ type: 'mutate', fn: (d) => Object.assign(d, s, { session: d.session }) }) } catch { /* ignore */ }
+        try { const s = JSON.parse(e.newValue); dispatch({ type: 'mutate', fn: (d) => Object.assign(d, s, { session: d.session, theme: d.theme }) }) } catch { /* ignore */ }
       }
     }
     window.addEventListener('storage', onStorage)

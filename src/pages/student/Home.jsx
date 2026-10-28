@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { BookOpenCheck, Bot, CalendarDays, Check, Flame, GraduationCap, HeartHandshake, Headphones, Palette, Search, ShoppingBag, Sparkles } from 'lucide-react'
-import { Avatar, Badge, Card, SectionTitle, useToast } from '../../components/ui'
-import { HeaderActions } from '../../components/MobileShell'
+import { BookOpenCheck, Bot, CalendarDays, Check, Flame, GraduationCap, Headphones, HeartHandshake, LifeBuoy, Palette, Search, ShoppingBag, Sparkles } from 'lucide-react'
+import { Avatar, Badge, Card, Coin, SectionTitle, useToast } from '../../components/ui'
+import { HomeHeader } from '../../components/MobileShell'
 import { BusMiniCard } from '../../features/BusRadar'
 import { NoticeCard, NoticeDetail } from '../../features/NoticeBoard'
 import { MicButton } from '../../features/Voice'
@@ -18,7 +18,7 @@ export function QuickTile({ icon: Icon, label, color, onClick, big }) {
       <span className={cx('grid place-items-center rounded-2xl shadow-card', big ? 'h-16 w-16' : 'h-14 w-14')} style={{ background: color + '1f' }}>
         <Icon className={big ? 'h-7 w-7' : 'h-6 w-6'} style={{ color }} />
       </span>
-      <span className="text-[11px] font-semibold leading-tight text-navy-800">{label}</span>
+      <span className="text-[11px] font-semibold leading-tight text-foreground">{label}</span>
     </button>
   )
 }
@@ -36,7 +36,7 @@ function VoiceSearch() {
     nav('/student/tutor?q=' + encodeURIComponent(text ?? q))
   }
   return (
-    <form onSubmit={(e) => { e.preventDefault(); go() }} className="flex items-center gap-2 rounded-2xl bg-white p-1.5 pl-3.5 shadow-card ring-1 ring-slate-900/5">
+    <form onSubmit={(e) => { e.preventDefault(); go() }} className="flex items-center gap-2 rounded-2xl bg-card p-1.5 pl-3.5 shadow-card ring-1 ring-slate-900/5">
       <Search className="h-4 w-4 shrink-0 text-slate-400" />
       <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={translate('voiceSearch', state.lang)} className="min-w-0 flex-1 bg-transparent text-sm outline-none" />
       <MicButton size={36} lang={state.lang} fallback="When is my maths exam?" onText={(t) => { setQ(t); setTimeout(() => go(t), 400) }} />
@@ -88,22 +88,14 @@ export default function StudentHome() {
 
   return (
     <div className="space-y-5 px-4 pb-4">
-      <div className="flex items-center gap-3 pt-1">
-        <Avatar emoji={user.avatar} color={user.color} size={46} />
-        <div className="min-w-0 flex-1">
-          <div className="text-xs text-slate-500">{translate(greeting(), lang)} 👋</div>
-          <div className="truncate font-display text-xl font-extrabold text-navy-800">{user.short}</div>
-          <div className="text-[11px] text-slate-500">Class {user.className} · Roll {user.roll} · Vidyanagar GHSS</div>
-        </div>
-        <HeaderActions userId={user.id} />
-      </div>
+      <HomeHeader greeting={translate(greeting(), lang)} name={user.short} sub={`Class ${user.className} · Roll ${user.roll} · Vidyanagar GHSS`} userId={user.id} />
 
       <VoiceSearch />
 
       <div className="grid grid-cols-3 gap-2">
         <Card onClick={() => nav('/student/store')} className="p-3">
           <div className="text-[10px] font-semibold text-slate-500">Vidya Coins</div>
-          <div className="font-display text-lg font-extrabold text-sun-600">🪙 {state.coins[user.id]}</div>
+          <div className="tabular flex items-center gap-1.5 font-display text-lg font-extrabold text-sun-600"><Coin size={18} /> {state.coins[user.id]}</div>
         </Card>
         <Card className="p-3">
           <div className="text-[10px] font-semibold text-slate-500">Streak</div>
@@ -123,10 +115,10 @@ export default function StudentHome() {
               : att.todayMark === 'A' ? <span className="font-semibold text-coral-600">Marked absent today</span> : <span className="text-slate-500">Attendance not yet taken</span>}
           </div>
           <div className="flex items-center gap-3 p-4">
-            <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-navy-800 text-center font-display text-xs font-bold leading-tight text-white">{next.time}</div>
+            <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-primary text-center font-display text-xs font-bold leading-tight text-white">{next.time}</div>
             <div className="min-w-0 flex-1">
               <div className="text-[11px] font-semibold text-teal-600">NEXT CLASS</div>
-              <div className="truncate text-sm font-bold text-navy-800">{next.subject} · {next.teacher}</div>
+              <div className="truncate text-sm font-bold text-foreground">{next.subject} · {next.teacher}</div>
               <div className="truncate text-xs text-slate-500">{next.topic}</div>
             </div>
             <Badge color="slate">{next.room}</Badge>
@@ -152,10 +144,10 @@ export default function StudentHome() {
             <button key={h.id} onClick={() => toggleHw(h.id)} className="flex w-full items-center gap-3 p-3.5 text-left">
               <span className={cx('grid h-6 w-6 shrink-0 place-items-center rounded-lg border-2', h.done ? 'border-teal-500 bg-teal-500' : 'border-slate-300')}>{h.done && <Check className="h-3.5 w-3.5 text-white" strokeWidth={3} />}</span>
               <span className="min-w-0 flex-1">
-                <span className={cx('block truncate text-[13px] font-semibold', h.done ? 'text-slate-400 line-through' : 'text-navy-800')}>{h.title}</span>
+                <span className={cx('block truncate text-[13px] font-semibold', h.done ? 'text-slate-400 line-through' : 'text-foreground')}>{h.title}</span>
                 <span className="text-[11px] text-slate-500">{h.subject} · due in {Math.max(0, daysUntil(h.due))} day(s)</span>
               </span>
-              <span className="text-[11px] font-bold text-sun-600">+{h.coins} 🪙</span>
+              <span className="flex items-center gap-1 text-[11px] font-bold text-sun-600">+{h.coins} <Coin size={13} /></span>
             </button>
           ))}
         </Card>
@@ -163,8 +155,8 @@ export default function StudentHome() {
 
       {!kid && (
         <Card onClick={() => nav('/student/help')} className="flex items-center gap-3 p-4">
-          <div className="grid h-11 w-11 place-items-center rounded-xl bg-coral-50 text-xl">🙋</div>
-          <div className="flex-1"><div className="text-sm font-bold text-navy-800">{translate('askGuidance', lang)}</div><div className="text-[11px] text-slate-500">Books, scholarships, exam doubts, worries – routed to the right person</div></div>
+          <div className="grid h-11 w-11 place-items-center rounded-2xl bg-coral-50 text-coral-500"><LifeBuoy className="h-5 w-5" /></div>
+          <div className="flex-1"><div className="text-sm font-bold text-foreground">{translate('askGuidance', lang)}</div><div className="text-[11px] text-slate-500">Books, scholarships, exam doubts, worries – routed to the right person</div></div>
           <BookOpenCheck className="h-5 w-5 text-slate-300" />
         </Card>
       )}

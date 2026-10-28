@@ -48,28 +48,28 @@ export function BusMap({ bus, className, compact }) {
     <svg viewBox="0 0 360 300" className={className} role="img" aria-label="Live bus map">
       <defs>
         <pattern id="paddy" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(30)">
-          <rect width="8" height="8" fill="#dcefd3" /><line x1="0" y1="0" x2="0" y2="8" stroke="#c8e4bb" strokeWidth="3" />
+          <rect width="8" height="8" className="map-field-a" /><line x1="0" y1="0" x2="0" y2="8" className="map-field-b" strokeWidth="3" />
         </pattern>
         <filter id="sh" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx="0" dy="1.5" stdDeviation="2" floodOpacity=".25" /></filter>
       </defs>
-      <rect width="360" height="300" fill="#eef3ea" />
+      <rect width="360" height="300" className="map-bg" />
       {/* paddy fields & groves */}
       <path d="M0 120 C40 110 60 150 40 190 C20 230 0 220 0 220Z" fill="url(#paddy)" />
       <path d="M210 20 C260 10 320 30 340 70 C300 90 250 80 220 60Z" fill="url(#paddy)" />
       <path d="M120 200 C150 190 180 220 170 260 C140 270 110 250 120 200Z" fill="url(#paddy)" />
       {[[60, 260], [80, 240], [250, 120], [270, 140], [300, 110], [140, 40], [160, 60], [30, 80]].map(([x, y], i) => (
-        <circle key={i} cx={x} cy={y} r="9" fill="#cfe5c3" />
+        <circle key={i} cx={x} cy={y} r="9" className="map-grove" />
       ))}
       {/* river Bharathapuzha */}
       <path d="M-10 285 C60 260 90 290 150 280 C200 272 220 300 260 300" stroke="#a9d4ee" strokeWidth="14" fill="none" strokeLinecap="round" />
       {!compact && <text x="40" y="292" fontSize="8" fill="#4a86d4" fontStyle="italic">Bharathapuzha</text>}
       {/* other roads */}
-      <path d="M0 160 L120 150 L188 134 L300 90 L360 80" stroke="#ffffff" strokeWidth="7" fill="none" />
+      <path d="M0 160 L120 150 L188 134 L300 90 L360 80" className="map-road" strokeWidth="7" fill="none" />
       <path d="M0 160 L120 150 L188 134 L300 90 L360 80" stroke="#e2e8f0" strokeWidth="1" fill="none" strokeDasharray="4 4" />
-      <path d="M200 0 L214 182 L230 300" stroke="#ffffff" strokeWidth="5" fill="none" />
+      <path d="M200 0 L214 182 L230 300" className="map-road" strokeWidth="5" fill="none" />
       {!compact && <text x="300" y="80" fontSize="8" fill="#94a3b8" fontWeight="600">NH 66</text>}
       {/* route */}
-      <path d={path} stroke="#ffffff" strokeWidth="9" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+      <path d={path} className="map-road" strokeWidth="9" fill="none" strokeLinecap="round" strokeLinejoin="round" />
       <path d={path} stroke="#9fb3cf" strokeWidth="4" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="2 6" />
       <path d={donePath} stroke="#26a69a" strokeWidth="5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
       {/* stops */}
@@ -80,10 +80,10 @@ export function BusMap({ bus, className, compact }) {
           <g key={s.id} filter="url(#sh)">
             {s.isHome && <circle cx={x} cy={y} r="13" fill="#f6b93b" opacity=".25" />}
             <circle cx={x} cy={y} r={s.isSchool || s.isHome ? 7 : 5.5} fill={s.isSchool ? '#14253f' : passed ? '#26a69a' : '#ffffff'} stroke={s.isHome ? '#e9a21c' : passed ? '#ffffff' : '#9fb3cf'} strokeWidth="2.5" />
-            {s.isHome && <text x={x} y={y + 3} fontSize="8" textAnchor="middle">🏠</text>}
+            {s.isHome && <path d={`M${x - 3.2} ${y + 0.4}l3.2-2.8 3.2 2.8v2.8h-6.4z`} fill="#e9a21c" />}
             {!compact && (
-              <text x={x + LABEL[i][0]} y={y + LABEL[i][1]} fontSize="9" fontWeight="700" fill="#14253f" textAnchor={LABEL[i][2]} stroke="#eef3ea" strokeWidth="3" paintOrder="stroke">
-                {s.isSchool ? '🏫 School' : s.name.split(' ')[0]}
+              <text x={x + LABEL[i][0]} y={y + LABEL[i][1]} fontSize="9" fontWeight="700" className="map-label" textAnchor={LABEL[i][2]} strokeWidth="3" paintOrder="stroke">
+                {s.isSchool ? 'School' : s.name.split(' ')[0]}
               </text>
             )}
           </g>
@@ -93,7 +93,7 @@ export function BusMap({ bus, className, compact }) {
       <g transform={`translate(${bus.pos[0]},${bus.pos[1]})`}>
         {!bus.idle && !bus.arrived && <circle r="10" fill="#f6b93b" className="origin-center animate-pulseRing" style={{ transformBox: 'fill-box' }} />}
         <circle r="11" fill="#f6b93b" stroke="#ffffff" strokeWidth="3" filter="url(#sh)" />
-        <text y="4" fontSize="11" textAnchor="middle">🚌</text>
+        <rect x="-5.5" y="-4.5" width="11" height="8" rx="2" fill="#14253f" /><rect x="-4" y="-3" width="8" height="3" rx=".8" fill="#fcdc8a" /><circle cx="-3" cy="4" r="1.4" fill="#14253f" /><circle cx="3" cy="4" r="1.4" fill="#14253f" />
       </g>
     </svg>
   )

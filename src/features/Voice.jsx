@@ -29,7 +29,7 @@ export function MicButton({ lang = 'en', onText, fallback, size = 40, className 
     listen(lang, { fallback, onResult: (t) => onText && onText(t), onEnd: () => setOn(false) })
   }
   return (
-    <button type="button" onClick={go} className={cx('relative grid shrink-0 place-items-center rounded-full text-white transition', on ? 'bg-coral-500' : 'bg-navy-800 hover:bg-navy-700', className)} style={{ width: size, height: size }} aria-label="Speak">
+    <button type="button" onClick={go} className={cx('relative grid shrink-0 place-items-center rounded-full text-white transition', on ? 'bg-coral-500' : 'bg-primary hover:bg-primary/90', className)} style={{ width: size, height: size }} aria-label="Speak">
       {on && <span className="absolute inset-0 animate-pulseRing rounded-full bg-coral-500" />}
       {on ? <Square className="relative h-4 w-4 fill-white" /> : <Mic className="relative h-[18px] w-[18px]" />}
     </button>
