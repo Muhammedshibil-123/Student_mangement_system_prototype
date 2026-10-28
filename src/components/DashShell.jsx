@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { Bell, LogOut, Menu, RotateCcw, Search, X } from 'lucide-react'
 import { Avatar, Logo, Sheet, useToast } from './ui'
-import { useSession, useStore } from '../store/Store'
+import { useLogout, useSession, useStore } from '../store/Store'
 import { cx, timeAgo } from '../lib/utils'
 import { SCHOOL } from '../data/seed'
 
@@ -19,7 +19,7 @@ export function DashShell({ nav, roleLabel, orgLine }) {
   const mine = state.notifications.filter((n) => n.to === user?.id)
   const unread = mine.filter((n) => !n.read).length
   const current = [...nav].reverse().find((n) => (n.end ? loc.pathname === n.to : loc.pathname.startsWith(n.to)))
-  const logout = () => { mutate((d) => { d.session = null }); navigate('/login') }
+  const logout = useLogout()
 
   const Side = (
     <div className="flex h-full flex-col bg-navy-800 text-white">
@@ -51,7 +51,7 @@ export function DashShell({ nav, roleLabel, orgLine }) {
           </div>
         </div>
         <div className="mt-1 grid grid-cols-2 gap-2">
-          <button onClick={logout} className="flex items-center justify-center gap-1.5 rounded-lg bg-white/10 py-2 text-xs font-semibold hover:bg-white/20"><LogOut className="h-3.5 w-3.5" /> Switch role</button>
+          <button onClick={logout} className="flex items-center justify-center gap-1.5 rounded-lg bg-white/10 py-2 text-xs font-semibold hover:bg-white/20"><LogOut className="h-3.5 w-3.5" /> Log out</button>
           <button onClick={() => { reset(); toast('Demo data reset', '♻️') }} className="flex items-center justify-center gap-1.5 rounded-lg bg-white/10 py-2 text-xs font-semibold hover:bg-white/20"><RotateCcw className="h-3.5 w-3.5" /> Reset demo</button>
         </div>
       </div>
@@ -82,6 +82,9 @@ export function DashShell({ nav, roleLabel, orgLine }) {
             <button onClick={() => { setOpenN(true); mutate((d) => d.notifications.forEach((n) => { if (n.to === user?.id) n.read = true })) }} className="relative grid h-10 w-10 place-items-center rounded-xl ring-1 ring-slate-200 hover:bg-slate-50" aria-label="Notifications">
               <Bell className="h-5 w-5 text-navy-800" />
               {unread > 0 && <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-coral-500 px-1 text-[10px] font-bold text-white">{unread}</span>}
+            </button>
+            <button onClick={() => { logout(); toast('Logged out. Pick another role to test.', '👋') }} className="flex h-10 items-center gap-2 rounded-xl px-3 text-sm font-semibold text-coral-600 ring-1 ring-slate-200 hover:bg-coral-50" aria-label="Log out">
+              <LogOut className="h-4 w-4" /><span className="hidden sm:inline">Log out</span>
             </button>
           </div>
         </header>

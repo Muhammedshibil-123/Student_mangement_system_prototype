@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useReducer } from 'react'
+import { useNavigate } from 'react-router-dom'
 import * as S from '../data/seed'
 import { hoursAgo, todayKey, uid } from '../lib/utils'
 
@@ -133,6 +134,17 @@ export function useSession() {
   const { state } = useStore()
   const user = state.session ? S.USERS[state.session.userId] : null
   return { session: state.session, user }
+}
+
+// Signs the current user out (this browser tab only) and returns to the login screen
+export function useLogout() {
+  const { mutate } = useStore()
+  const nav = useNavigate()
+  return useCallback(() => {
+    persistSession(null)
+    mutate((d) => { d.session = null })
+    nav('/login')
+  }, [mutate, nav])
 }
 
 export function useT() {

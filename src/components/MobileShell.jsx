@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { ArrowLeft, Bell, BatteryMedium, Languages, LogOut, RotateCcw, Signal, Wifi } from 'lucide-react'
 import { Logo, Sheet, useToast } from './ui'
-import { useSession, useStore } from '../store/Store'
+import { useLogout, useSession, useStore } from '../store/Store'
 import { LANGS, translate } from '../i18n'
 import { cx, timeAgo } from '../lib/utils'
 
@@ -23,7 +23,7 @@ export function MobileShell({ tabs, guide, roleLabel, accent = '#26a69a' }) {
 
   useEffect(() => { scrollRef.current && scrollRef.current.scrollTo(0, 0) }, [loc.pathname])
 
-  const logout = () => { mutate((d) => { d.session = null }); nav('/login') }
+  const logout = useLogout()
 
   return (
     <div className="min-h-screen bg-[radial-gradient(1200px_600px_at_10%_-10%,#dff3f0,transparent),radial-gradient(900px_500px_at_110%_10%,#fdf1d6,transparent)] bg-slate-50 md:flex md:items-center md:justify-center md:gap-10 md:p-6">
@@ -49,7 +49,7 @@ export function MobileShell({ tabs, guide, roleLabel, accent = '#26a69a' }) {
           </div>
         </div>
         <div className="mt-3 flex gap-2">
-          <button onClick={logout} className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-navy-800 px-3 py-2 text-xs font-semibold text-white hover:bg-navy-700"><LogOut className="h-3.5 w-3.5" /> Switch role</button>
+          <button onClick={logout} className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-navy-800 px-3 py-2 text-xs font-semibold text-white hover:bg-navy-700"><LogOut className="h-3.5 w-3.5" /> Log out</button>
           <button onClick={() => { reset(); toast('Demo data reset', '♻️') }} className="flex items-center justify-center gap-1.5 rounded-xl bg-white px-3 py-2 text-xs font-semibold text-navy-800 ring-1 ring-slate-200 hover:bg-slate-50"><RotateCcw className="h-3.5 w-3.5" /> Reset demo</button>
         </div>
         <p className="mt-3 text-[11px] leading-relaxed text-slate-400">Prototype with demo data. Tip: open a second tab with another role. Actions sync between tabs (for example, the driver reports a delay and the parent sees it).</p>
@@ -116,6 +116,8 @@ export function MobileHeader({ title, sub, back, right, transparent, children })
 
 export function HeaderActions({ userId }) {
   const { state, mutate } = useStore()
+  const logout = useLogout()
+  const toast = useToast()
   const [openN, setOpenN] = useState(false)
   const [openL, setOpenL] = useState(false)
   const mine = state.notifications.filter((n) => n.to === userId)
@@ -128,6 +130,9 @@ export function HeaderActions({ userId }) {
       <button onClick={() => { setOpenN(true); mutate((d) => d.notifications.forEach((n) => { if (n.to === userId) n.read = true })) }} className="relative grid h-9 w-9 place-items-center rounded-full bg-white shadow-card ring-1 ring-slate-900/5" aria-label="Notifications">
         <Bell className="h-4 w-4 text-navy-800" />
         {unread > 0 && <span className="absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-coral-500 px-1 text-[9px] font-bold text-white">{unread}</span>}
+      </button>
+      <button onClick={() => { logout(); toast('Logged out. Pick another role to test.', '👋') }} className="grid h-9 w-9 place-items-center rounded-full bg-white text-coral-600 shadow-card ring-1 ring-slate-900/5" aria-label="Log out" title="Log out">
+        <LogOut className="h-4 w-4" />
       </button>
       <Sheet open={openN} onClose={() => setOpenN(false)} title="Notifications">
         {mine.length === 0 && <div className="py-6 text-center text-sm text-slate-500">You are all caught up 🎉</div>}

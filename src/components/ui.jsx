@@ -227,7 +227,7 @@ export function ToastProvider({ children }) {
   const [items, setItems] = useState([])
   const push = useCallback((text, icon = '✅') => {
     const id = Math.random()
-    setItems((s) => [...s, { id, text, icon }])
+    setItems((s) => [...s.slice(-1), { id, text, icon }]) // at most two on screen
     setTimeout(() => setItems((s) => s.filter((x) => x.id !== id)), 3200)
   }, [])
   return (

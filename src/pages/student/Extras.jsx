@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { ChevronRight, Heart, MessageCircle, Plus, RotateCcw, Upload } from 'lucide-react'
 import { Avatar, Badge, Button, Card, Field, SectionTitle, Sheet, Tabs, Toggle, inputCls, useToast } from '../../components/ui'
 import { MobileHeader, HeaderActions } from '../../components/MobileShell'
-import { useSession, useStore } from '../../store/Store'
+import { useLogout, useSession, useStore } from '../../store/Store'
 import { CAREER_QUIZ, CAREER_RESULTS, FAMILY_PROFILES, STORE_ITEMS, USERS } from '../../data/seed'
 import { LANGS, translate } from '../../i18n'
 import { cx, inr, timeAgo, uid } from '../../lib/utils'
@@ -235,6 +235,7 @@ export function MoreMenu({ items, base }) {
   const { state, mutate } = useStore()
   const { user } = useSession()
   const nav = useNavigate()
+  const logout = useLogout()
   const family = FAMILY_PROFILES.map((id) => USERS[id]).filter((u) => u.id !== user.id)
   return (
     <div>
@@ -279,7 +280,7 @@ export function MoreMenu({ items, base }) {
             <Toggle checked={state.consent.voice} onChange={(v) => mutate((d) => { d.consent.voice = v })} label="Voice prompts" sub="Read screens aloud for low-literacy users" />
           </div>
         </Card>
-        <button onClick={() => { mutate((d) => { d.session = null }); nav('/login') }} className="flex w-full items-center justify-between rounded-2xl bg-white p-4 text-sm font-semibold text-coral-600 shadow-card ring-1 ring-slate-900/5">{translate('logout', state.lang)} <ChevronRight className="h-4 w-4" /></button>
+        <button onClick={logout} className="flex w-full items-center justify-between rounded-2xl bg-white p-4 text-sm font-semibold text-coral-600 shadow-card ring-1 ring-slate-900/5">{translate('logout', state.lang)} <ChevronRight className="h-4 w-4" /></button>
         <p className="pb-2 text-center text-[10px] text-slate-400">Vidya Sethu prototype v0.1 · demo data only · DPDP Act 2023 aligned design</p>
       </div>
     </div>
